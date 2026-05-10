@@ -9,16 +9,15 @@
   :root { 
     --bg-primary: #020406; --bg-sidebar: rgba(6, 11, 20, 0.98); --bg-card: #0a0e17; 
     --accent-blue: #007bff; --accent-cyan: #00e5ff; --accent-green: #00ffa3;
-    --accent-purple: #9d50bb; --accent-red: #ff3d6b; --accent-amber: #ffb300;
+    --accent-purple: #9d50bb; --accent-indigo: #6e48aa;
+    --accent-red: #ff3d6b; --accent-amber: #ffb300;
     --text-primary: #f0f5ff; --text-secondary: #8b9bb4; --border-subtle: rgba(0, 229, 255, 0.15); --sidebar-w: 300px; 
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; display: flex; overflow-x: hidden; min-height: 100vh; }
   
-  /* FIX RADICAL PARA EL AUTOFILL BLANCO */
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover, 
-  input:-webkit-autofill:focus {
+  /* FIX AUTOFILL BLANCO */
+  input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
     -webkit-text-fill-color: var(--accent-cyan) !important;
     -webkit-box-shadow: 0 0 0px 1000px var(--bg-card) inset !important;
     transition: background-color 5000s ease-in-out 0s;
@@ -29,7 +28,9 @@
   /* LOGIN */
   #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
   .login-box { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 50px; border-radius: 8px; width: 420px; text-align: center; border-top: 4px solid var(--accent-blue); }
+  .pass-container { position: relative; width: 100%; }
   .login-field { width: 100%; background: #050a14; border: 1px solid var(--border-subtle); padding: 15px; color: white; margin-bottom: 20px; outline: none; font-family: 'Share Tech Mono'; }
+  .toggle-pass { position: absolute; right: 15px; top: 15px; cursor: pointer; color: var(--accent-blue); font-size: 12px; font-family: 'Orbitron'; }
   .btn-login { width: 100%; padding: 15px; background: transparent; border: 2px solid var(--accent-blue); color: var(--accent-blue); cursor: pointer; font-family: 'Orbitron'; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
 
   /* SIDEBAR */
@@ -61,7 +62,6 @@
   .badge-alta { background: rgba(255, 61, 107, 0.1); color: var(--accent-red); border: 1px solid var(--accent-red); padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 900; }
   .badge-resuelto { background: rgba(0, 255, 163, 0.1); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 900; }
 
-  /* MODAL */
   #modalObs { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:10000; align-items:center; justify-content:center; backdrop-filter:blur(15px); }
   .modal-content { background:var(--bg-card); border:1px solid var(--accent-blue); padding:40px; width:500px; border-radius:12px; border-top: 4px solid var(--accent-blue); }
 </style>
@@ -71,8 +71,11 @@
 <div id="loginOverlay">
   <div class="login-box">
     <h2 style="font-family:'Orbitron'; color:white; margin-bottom:30px;">IT HELP DESK <span>CONTROL</span></h2>
-    <input type="text" id="lUser" placeholder="ID OPERADOR" class="login-field">
-    <input type="password" id="lPass" placeholder="SECURITY KEY" class="login-field">
+    <input type="text" id="lUser" placeholder="ID OPERADOR" class="login-field" onkeypress="handleEnter(event)">
+    <div class="pass-container">
+      <input type="password" id="lPass" placeholder="SECURITY KEY" class="login-field" onkeypress="handleEnter(event)">
+      <span class="toggle-pass" onclick="togglePassword()">VER</span>
+    </div>
     <button class="btn-login" onclick="attemptLogin()">AUTENTICAR SISTEMA</button>
   </div>
 </div>
@@ -124,6 +127,15 @@
   };
 
   let fullData = []; let charts = {}; let currentView = 'monitor'; let currentUser = null; let ticketIdResolviendo = "";
+
+  function togglePassword() {
+    const p = document.getElementById('lPass');
+    const b = document.querySelector('.toggle-pass');
+    if (p.type === "password") { p.type = "text"; b.textContent = "OCULTAR"; }
+    else { p.type = "password"; b.textContent = "VER"; }
+  }
+
+  function handleEnter(e) { if (e.key === 'Enter') attemptLogin(); }
 
   function attemptLogin() {
     const u = document.getElementById('lUser').value.trim();
@@ -181,31 +193,19 @@
     if(charts.c1) charts.c1.destroy(); if(charts.c2) charts.c2.destroy(); if(charts.c3) charts.c3.destroy();
 
     const dev = {}; data.forEach(t => dev[t.dispositivo] = (dev[t.dispositivo] || 0) + 1);
-    
-    const cleanOpts = {
-      responsive: true, maintainAspectRatio: false,
-      scales: {
-        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#8b9bb4' }, grid: { display: false } },
-        x: { ticks: { color: '#8b9bb4' }, grid: { display: false } },
-        r: { angleLines: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { display: false }, pointLabels: { color: '#8b9bb4', font: { size: 10 } } }
-      },
-      plugins: { legend: { labels: { color: '#8b9bb4' } } }
-    };
+    const cleanOpts = { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: '#8b9bb4' }, grid: { display: false } }, x: { ticks: { color: '#8b9bb4' }, grid: { display: false } }, r: { angleLines: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { display: false }, pointLabels: { color: '#8b9bb4', font: { size: 10 } } } }, plugins: { legend: { labels: { color: '#8b9bb4' } } } };
 
     if(currentView === 'monitor') {
       charts.c1 = new Chart(ctx1, { type: 'radar', data: { labels: Object.keys(dev), datasets: [{ label: 'Tickets', data: Object.values(dev), borderColor: '#00e5ff', backgroundColor: 'rgba(0,229,255,0.2)', fill: true }] }, options: cleanOpts });
     } else {
-      // KPI DE TIEMPO DE RESPUESTA (Spline)
       charts.c1 = new Chart(ctx1, { type: 'line', data: { labels: data.slice(-7).map(t=>t.id), datasets: [{ label: 'Horas / Ticket', data: [2, 1, 3, 1, 0.5, 2, 1.2], borderColor: '#00ffa3', tension: 0.4, fill: true, backgroundColor: 'rgba(0,255,163,0.1)' }] }, options: cleanOpts });
     }
-
     charts.c2 = new Chart(ctx2, { type: 'bar', data: { labels: ['Alta', 'Normal'], datasets: [{ label: 'Volumen', data: [data.filter(t=>t.prioridad==='Alta').length, data.filter(t=>t.prioridad!=='Alta').length], backgroundColor: ['#ff3d6b', '#007bff'] }] }, options: cleanOpts });
     charts.c3 = new Chart(ctx3, { type: 'polarArea', data: { labels: ['Net', 'Sec', 'HW', 'SW', 'Ops'], datasets: [{ data: [15, 25, 20, 30, 10], backgroundColor: ['#00ffa3', '#9d50bb', '#007bff', '#ffb300', '#ff3d6b'] }] }, options: { ...cleanOpts, scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } } } } });
   }
 
   function abrirModal(id) { ticketIdResolviendo = id; document.getElementById('modalTicketId').textContent = id; document.getElementById('modalObs').style.display='flex'; }
   function cerrarModal() { document.getElementById('modalObs').style.display='none'; }
-
   async function enviarResolucion() {
     const obs = document.getElementById('textoObs').value.trim();
     if(!obs) return alert("BITÁCORA REQUERIDA");

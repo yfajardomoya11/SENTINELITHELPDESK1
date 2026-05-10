@@ -79,7 +79,14 @@
     <div id="formView">
       <div class="form-group">
         <label class="form-label">👤 COLABORADOR</label>
-        <input type="text" id="colaborador" class="form-input" placeholder="Nombre completo" autocomplete="off">
+        <select id="colaborador" class="form-select">
+          <option value="">Seleccione su nombre...</option>
+          <option value="Nikola Tesla">Nikola Tesla</option>
+          <option value="Isaac Newton">Isaac Newton</option>
+          <option value="Sherlock Holmes">Sherlock Holmes</option>
+          <option value="Hulk">Hulk</option>
+          <option value="Batman">Batman</option>
+        </select>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -165,13 +172,13 @@
   }
 
   async function sendTicket() {
-    const col = document.getElementById('colaborador').value.trim();
+    const col = document.getElementById('colaborador').value;
     const dev = document.getElementById('dispositivo').value;
     const fal = document.getElementById('falla').value;
     const pVal = document.getElementById('pSlider').value;
     const prioridades = ["Baja", "Normal", "Alta"];
 
-    if (!col || !dev || !fal) { alert("⚠️ Mae, rellene todo el formulario."); return; }
+    if (!col || !dev || !fal) { alert("⚠️ Mae, seleccione todos los campos."); return; }
 
     const btn = document.getElementById('btnSend');
     btn.disabled = true; btn.textContent = "ENVIANDO DATOS...";
@@ -197,4 +204,5 @@
   }
 </script>
 </body>
+</html>
 </html>

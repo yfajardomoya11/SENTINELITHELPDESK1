@@ -30,43 +30,21 @@
     padding: 12px; color: white; font-family: 'Rajdhani'; font-size: 15px; outline: none; border-radius: 4px;
     transition: 0.3s;
   }
-  .form-select:focus { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0, 229, 255, 0.2); }
 
-  /* EXPLICACIÓN DINÁMICA */
-  .info-box { 
-    margin-top: 10px; padding: 12px; border-radius: 4px; font-size: 11px; 
-    font-family: 'Share Tech Mono'; display: none; line-height: 1.5;
-    animation: slideDown 0.3s ease;
-  }
-  .info-prev { background: rgba(0, 255, 163, 0.05); border: 1px solid var(--accent-green); color: var(--accent-green); }
-  .info-corr { background: rgba(255, 179, 0, 0.05); border: 1px solid var(--accent-amber); color: var(--accent-amber); }
-  
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* SELECTOR DE URGENCIA */
-  .priority-container { background: #05070a; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center; }
-  .priority-slider { -webkit-appearance: none; width: 100%; height: 6px; background: #1a1d2d; outline: none; border-radius: 10px; margin: 15px 0; }
-  .priority-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: #fff; cursor: pointer; border-radius: 50%; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
-
-  .priority-labels { display: flex; justify-content: space-between; padding: 0 5px; }
-  .p-label { font-family: 'Share Tech Mono'; font-size: 10px; color: var(--text-secondary); transition: 0.3s; }
-  .state-low { color: var(--accent-green) !important; }
-  .state-mid { color: var(--accent-cyan) !important; }
-  .state-high { color: var(--accent-red) !important; text-shadow: 0 0 10px var(--accent-red); }
-
-  /* BOTÓN SIMPLIFICADO */
   .btn-submit { 
     width: 100%; padding: 20px; background: var(--accent-blue); border: none; 
     color: white; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; 
     text-transform: uppercase; letter-spacing: 4px; border-radius: 4px; transition: 0.3s; 
   }
-  .btn-submit:hover { background: #0056b3; box-shadow: 0 0 30px rgba(0, 123, 255, 0.4); transform: translateY(-2px); }
-  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:hover { background: #0056b3; box-shadow: 0 0 30px rgba(0, 123, 255, 0.4); }
 
-  #successView { display: none; text-align: center; animation: fadeIn 0.5s ease; }
-  .id-badge { background: #001a14; color: var(--accent-green); padding: 15px 30px; border-radius: 4px; font-family: 'Share Tech Mono'; font-size: 20px; border: 1px solid var(--accent-green); display: inline-block; margin: 20px 0; }
+  /* VISTA DE ÉXITO */
+  #successView { display: none; text-align: center; animation: fadeIn 0.6s ease forwards; }
+  .success-icon { font-size: 50px; color: var(--accent-green); margin-bottom: 20px; }
+  .id-badge { background: #001a14; color: var(--accent-green); padding: 15px 30px; border-radius: 4px; font-family: 'Share Tech Mono'; font-size: 22px; border: 1px solid var(--accent-green); display: inline-block; margin: 20px 0; }
+  .success-msg { font-size: 16px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 30px; }
   
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -88,57 +66,54 @@
         </select>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">⚙️ TIPO DE GESTIÓN</label>
-        <select id="gestion" class="form-select" onchange="explainGestion()">
-          <option value="">Seleccionar...</option>
-          <option value="Preventivo">Mantenimiento Preventivo</option>
-          <option value="Correctivo">Mantenimiento Correctivo</option>
-        </select>
-        <div id="infoPrev" class="info-box info-prev">🛡️ <strong>PREVENTIVO:</strong> Acción proactiva para evitar fallas técnicas.</div>
-        <div id="infoCorr" class="info-box info-corr">🛠️ <strong>CORRECTIVO:</strong> Reparación inmediata de un fallo existente.</div>
-      </div>
-
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
         <div class="form-group">
-          <label class="form-label">🖥️ CATEGORÍA</label>
+          <label class="form-label">🖥️ DISPOSITIVO</label>
           <select id="dispositivo" class="form-select" onchange="loadFaults()">
             <option value="">Seleccionar...</option>
-            <option value="Hardware">Hardware / Equipos</option>
-            <option value="Redes">Redes / Conectividad</option>
-            <option value="Software">Software / Apps</option>
-            <option value="Accesos">Accesos / Seguridad</option>
+            <option>PC Escritorio</option>
+            <option>Laptop</option>
+            <option>Impresora</option>
+            <option>Router / Switch</option>
+            <option>Teléfono IP</option>
+            <option>CCTV / Cámaras</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">⚠️ FALLA ESPECÍFICA</label>
-          <select id="falla" class="form-select" disabled><option value="">Esperando categoría...</option></select>
-        </div>
-      </div>
-
-      <div class="priority-container">
-        <label class="form-label">URGENCIA DEL REPORTE</label>
-        <input type="range" min="1" max="3" value="2" class="priority-slider" id="pSlider" oninput="updatePriority()">
-        <div class="priority-labels">
-          <span class="p-label" id="lbl1">BAJA</span>
-          <span class="p-label state-mid" id="lbl2">NORMAL</span>
-          <span class="p-label" id="lbl3">ALTA</span>
+          <select id="falla" class="form-select" disabled><option value="">Esperando...</option></select>
         </div>
       </div>
 
       <div class="form-group">
+        <label class="form-label">⚙️ TIPO DE GESTIÓN</label>
+        <select id="gestion" class="form-select">
+          <option value="">Seleccionar...</option>
+          <option value="Preventivo">Mantenimiento Preventivo</option>
+          <option value="Correctivo">Mantenimiento Correctivo</option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label class="form-label">📝 NOTAS TÉCNICAS</label>
-        <textarea id="descripcion" class="form-textarea" rows="2" placeholder="Describa brevemente el incidente..."></textarea>
+        <textarea id="descripcion" class="form-textarea" rows="2" placeholder="Detalles del problema..."></textarea>
       </div>
 
       <button class="btn-submit" id="btnSend" onclick="sendTicket()">ENVIAR REPORTE</button>
     </div>
 
     <div id="successView">
-      <h2 style="font-family:'Orbitron'; color: var(--accent-green);">TICKET REGISTRADO</h2>
-      <p style="margin-top:15px; color:var(--text-secondary);">El incidente ha sido enviado a la central de monitoreo.</p>
+      <div class="success-icon">✔</div>
+      <h2 style="font-family:'Orbitron'; color: white;">RECIBIDO</h2>
+      <p class="success-msg">
+        Gracias, <span id="userNameSuccess" style="color:var(--accent-cyan); font-weight:bold;"></span>.<br>
+        Su reporte ha sido procesado con éxito.
+      </p>
       <div class="id-badge" id="resId"></div>
-      <button onclick="location.reload()" style="display:block; width:100%; background:none; border:1px solid var(--accent-blue); color:var(--accent-blue); padding:12px; cursor:pointer; font-family:'Orbitron';">NUEVO REPORTE</button>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 25px;">
+        El equipo de TI se pondrá en contacto con usted a la brevedad posible.
+      </p>
+      <button onclick="location.reload()" style="background:transparent; border:1px solid var(--accent-blue); color:var(--accent-blue); padding:10px 20px; cursor:pointer; font-family:'Orbitron'; border-radius:4px; font-size:11px;">NUEVO REPORTE</button>
     </div>
   </div>
 </div>
@@ -146,33 +121,20 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
   
-  function explainGestion() {
-    const v = document.getElementById('gestion').value;
-    document.getElementById('infoPrev').style.display = (v === 'Preventivo') ? 'block' : 'none';
-    document.getElementById('infoCorr').style.display = (v === 'Correctivo') ? 'block' : 'none';
-  }
-
-  function updatePriority() {
-    const val = document.getElementById('pSlider').value;
-    const labels = [document.getElementById('lbl1'), document.getElementById('lbl2'), document.getElementById('lbl3')];
-    labels.forEach(l => l.className = 'p-label');
-    if(val == 1) labels[0].classList.add('state-low');
-    else if(val == 2) labels[1].classList.add('state-mid');
-    else labels[2].classList.add('state-high');
-  }
-
-  // FALLAS PERSONALIZADAS SEGÚN CATEGORÍA
+  // FALLAS DETALLADAS POR DISPOSITIVO
   const FAULTS = {
-    'Hardware': ['Equipo no enciende', 'Daño físico visible', 'Ruidos / Sobrecalentamiento', 'Falla de periféricos'],
-    'Redes': ['Sin conexión a Internet', 'Lentitud extrema en red', 'Falla de telefonía IP', 'Punto de red dañado'],
-    'Software': ['Error en sistema operativo', 'Aplicación no abre', 'Problemas con Office / Correo', 'Error de impresión'],
-    'Accesos': ['Contraseña bloqueada', 'Falla de VPN', 'Problemas con MFA / Token', 'Permisos de carpeta']
+    'PC Escritorio': ['No enciende', 'Pantalla Azul (BSOD)', 'Lento / Se pega', 'Falla de Disco Duro'],
+    'Laptop': ['No carga batería', 'Teclado no responde', 'Pantalla quebrada', 'Sobrecalentamiento'],
+    'Impresora': ['Atasco de papel', 'Mancha las hojas', 'Error de Tóner/Tinta', 'No detectada en red'],
+    'Router / Switch': ['Sin acceso a Internet', 'Wi-Fi inestable', 'Puerto físico dañado', 'Caída de segmento'],
+    'Teléfono IP': ['Sin tono de llamada', 'Pantalla apagada', 'Audio distorsionado', 'Error de registro'],
+    'CCTV / Cámaras': ['Cámara fuera de línea', 'Imagen borrosa', 'Falla de grabación', 'Problema con NVR/DVR']
   };
 
   function loadFaults() {
     const d = document.getElementById('dispositivo').value;
     const f = document.getElementById('falla');
-    f.innerHTML = '<option value="">Seleccione la falla...</option>';
+    f.innerHTML = '<option value="">Seleccione falla...</option>';
     if (FAULTS[d]) {
       FAULTS[d].forEach(x => { let o = document.createElement('option'); o.value = o.textContent = x; f.appendChild(o); });
       f.disabled = false;
@@ -184,12 +146,11 @@
     const ges = document.getElementById('gestion').value;
     const dev = document.getElementById('dispositivo').value;
     const fal = document.getElementById('falla').value;
-    const prio = ["Baja", "Normal", "Alta"][document.getElementById('pSlider').value-1];
 
-    if (!col || !ges || !dev || !fal) { alert("⚠️ Por favor, complete todos los campos."); return; }
+    if (!col || !ges || !dev || !fal) { alert("⚠️ Mae, rellene todos los campos."); return; }
 
     const btn = document.getElementById('btnSend');
-    btn.disabled = true; btn.textContent = "PROCESANDO...";
+    btn.disabled = true; btn.textContent = "ENVIANDO...";
 
     const tId = "TK-" + Math.random().toString(36).substr(2, 6).toUpperCase();
 
@@ -199,10 +160,11 @@
         body: JSON.stringify({
           action: "add", id: tId, colaborador: col, gestion: ges,
           dispositivo: dev, falla: fal, descripcion: document.getElementById('descripcion').value,
-          fechaDisplay: new Date().toLocaleString(), estado: "Pendiente", prioridad: prio
+          fechaDisplay: new Date().toLocaleString(), estado: "Pendiente", prioridad: "Normal"
         })
       });
       document.getElementById('formView').style.display = 'none';
+      document.getElementById('userNameSuccess').textContent = col;
       document.getElementById('resId').textContent = tId;
       document.getElementById('successView').style.display = 'block';
     } catch (e) { alert("Error de red"); btn.disabled = false; }

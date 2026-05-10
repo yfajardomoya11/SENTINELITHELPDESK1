@@ -13,6 +13,7 @@
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0, 123, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 123, 255, 0.02) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
 
   .container { width: 100%; max-width: 550px; z-index: 1; }
   .form-card { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 40px; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-top: 4px solid var(--accent-blue); }
@@ -29,39 +30,24 @@
     padding: 12px; color: white; font-family: 'Rajdhani'; font-size: 15px; outline: none; border-radius: 4px;
   }
 
-  /* CAJAS DE EXPLICACIÓN DINÁMICA */
-  .info-box { 
-    margin-top: 10px; padding: 12px; border-radius: 4px; font-size: 12px; 
-    font-family: 'Share Tech Mono'; display: none; line-height: 1.4;
-    animation: fadeIn 0.3s ease;
-  }
+  .info-box { margin-top: 10px; padding: 12px; border-radius: 4px; font-size: 12px; font-family: 'Share Tech Mono'; display: none; }
   .info-prev { background: rgba(0, 255, 163, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); }
   .info-corr { background: rgba(255, 179, 0, 0.1); border: 1px solid var(--accent-amber); color: var(--accent-amber); }
 
-  /* BARRA DE PRIORIDAD (SLIDER) */
   .priority-container { background: #05070a; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 8px; margin: 25px 0; text-align: center; }
   .priority-slider { -webkit-appearance: none; width: 100%; height: 8px; background: #1a1d2d; outline: none; border-radius: 10px; margin: 15px 0; }
-  .priority-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: #fff; cursor: pointer; border-radius: 50%; box-shadow: 0 0 15px rgba(255,255,255,0.4); border: 2px solid var(--accent-blue); }
+  .priority-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: #fff; cursor: pointer; border-radius: 50%; border: 2px solid var(--accent-blue); }
 
-  .priority-labels { display: flex; justify-content: space-between; padding: 0 10px; }
   .p-label { font-family: 'Orbitron'; font-size: 9px; color: var(--text-secondary); transition: 0.3s; }
-  
-  /* ESTADOS DE LA BARRA */
   .state-low { color: var(--accent-green) !important; text-shadow: 0 0 8px var(--accent-green); }
   .state-mid { color: var(--accent-cyan) !important; text-shadow: 0 0 8px var(--accent-cyan); }
   .state-high { color: var(--accent-red) !important; text-shadow: 0 0 10px var(--accent-red); font-weight: bold; }
 
-  .btn-submit { 
-    width: 100%; padding: 20px; background: var(--accent-blue); border: none; 
-    color: white; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; 
-    text-transform: uppercase; letter-spacing: 4px; border-radius: 4px; transition: 0.3s; 
-  }
+  .btn-submit { width: 100%; padding: 20px; background: var(--accent-blue); border: none; color: white; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 4px; border-radius: 4px; transition: 0.3s; }
   .btn-submit:hover { background: #0056b3; box-shadow: 0 0 30px rgba(0, 123, 255, 0.4); }
 
-  #successView { display: none; text-align: center; animation: fadeIn 0.5s ease; }
+  #successView { display: none; text-align: center; }
   .id-badge { background: #001a14; color: var(--accent-green); padding: 15px 30px; border-radius: 4px; font-family: 'Share Tech Mono'; font-size: 22px; border: 1px solid var(--accent-green); display: inline-block; margin: 20px 0; }
-  
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -90,8 +76,8 @@
           <option value="Preventivo">Mantenimiento Preventivo</option>
           <option value="Correctivo">Mantenimiento Correctivo</option>
         </select>
-        <div id="infoPrev" class="info-box info-prev">🛡️ <strong>SISTEMA PROACTIVO:</strong> Se solicita para evitar fallos futuros (limpieza, revisión de rutina, actualizaciones).</div>
-        <div id="infoCorr" class="info-box info-corr">🛠️ <strong>SISTEMA REACTIVO:</strong> Se solicita porque algo YA falló y necesita reparación inmediata.</div>
+        <div id="infoPrev" class="info-box info-prev">🛡️ <strong>PREVENTIVO:</strong> Tareas para evitar fallos futuros.</div>
+        <div id="infoCorr" class="info-box info-corr">🛠️ <strong>CORRECTIVO:</strong> Reparación de una falla existente.</div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -103,11 +89,12 @@
             <option>Laptop</option>
             <option>Impresora</option>
             <option>Router / Switch</option>
-            <option>Teléfono IP</option>
+            <option>Teléfono Móvil</option>
+            <option>Periféricos</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">⚠️ FALLA</label>
+          <label class="form-label">⚠️ FALLA ESPECÍFICA</label>
           <select id="falla" class="form-select" disabled><option value="">Esperando...</option></select>
         </div>
       </div>
@@ -143,33 +130,65 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
   
-  // EXPLICACIÓN DE GESTIÓN
   function explainGestion() {
     const v = document.getElementById('gestion').value;
     document.getElementById('infoPrev').style.display = (v === 'Preventivo') ? 'block' : 'none';
     document.getElementById('infoCorr').style.display = (v === 'Correctivo') ? 'block' : 'none';
   }
 
-  // LÓGICA DE LA BARRA DE PRIORIDAD
   function updatePriority() {
     const val = document.getElementById('pSlider').value;
-    const l1 = document.getElementById('lbl1');
-    const l2 = document.getElementById('lbl2');
-    const l3 = document.getElementById('lbl3');
-    
-    l1.className = 'p-label'; l2.className = 'p-label'; l3.className = 'p-label';
-
+    const l1 = document.getElementById('lbl1'); const l2 = document.getElementById('lbl2'); const l3 = document.getElementById('lbl3');
+    l1.className = l2.className = l3.className = 'p-label';
     if(val == 1) l1.classList.add('state-low');
     else if(val == 2) l2.classList.add('state-mid');
     else if(val == 3) l3.classList.add('state-high');
   }
 
+  // CATÁLOGO DE FALLAS QUIRÚRGICAS
   const FAULTS = {
-    'PC Escritorio': ['No enciende', 'Pantalla Azul', 'Lento', 'Falla Periféricos'],
-    'Laptop': ['Batería no carga', 'Teclado falla', 'Pantalla rota', 'Wi-Fi'],
-    'Impresora': ['Atasco de papel', 'Sin tóner', 'No imprime', 'Error red'],
-    'Router / Switch': ['Sin Internet', 'Wi-Fi lento', 'Puerto dañado'],
-    'Teléfono IP': ['Sin audio', 'No registra', 'Pantalla negra']
+    'PC Escritorio': [
+      'No enciende (Falla de fuente)',
+      'Reinicio constante (Loop)',
+      'Pantallazo azul / Error crítico',
+      'Puerto USB / Video no funciona',
+      'Lentitud extrema / Disco al 100%'
+    ],
+    'Laptop': [
+      'Batería no retiene carga',
+      'Pantalla parpadea / Rayas',
+      'Touchpad / Teclado pegado',
+      'No detecta redes Wi-Fi',
+      'Calentamiento excesivo (Ventilador)'
+    ],
+    'Impresora': [
+      'Atasco de papel constante',
+      'Líneas negras en impresión',
+      'No detectada en la red (IP)',
+      'Error de tóner / Tambor',
+      'Escaneo no llega al destino'
+    ],
+    'Router / Switch': [
+      'Puertos físicos sin señal',
+      'Cortes intermitentes de red',
+      'Configuración de VLAN perdida',
+      'Equipo bloqueado (No responde)',
+      'Velocidad limitada (Autonegociación)'
+    ],
+    'Teléfono Móvil': [
+      'Pantalla táctil errática',
+      'Problema de carga (Puerto C)',
+      'Apps corporativas no abren',
+      'Batería se descarga rápido',
+      'No sincroniza correo / MFA'
+    ],
+    'Periféricos': [
+      'Mouse con doble clic / Sensor',
+      'Monitor sin imagen (Backlight)',
+      'Cámara desenfocada / No detectada',
+      'Teclado con teclas omitidas',
+      'Audio con ruido / Diadema rota'
+    ]
   };
 
   function loadFaults() {
@@ -190,11 +209,10 @@
     const pVal = document.getElementById('pSlider').value;
     const prio = ["Baja", "Normal", "Alta"][pVal-1];
 
-    if (!col || !ges || !dev || !fal) { alert("⚠️ Rellene los campos, mae."); return; }
+    if (!col || !ges || !dev || !fal) { alert("⚠️ Mae, rellene todo."); return; }
 
     const btn = document.getElementById('btnSend');
-    btn.disabled = true; btn.textContent = "PROCESANDO...";
-
+    btn.disabled = true; btn.textContent = "ENVIANDO...";
     const tId = "TK-" + Math.random().toString(36).substr(2, 6).toUpperCase();
 
     try {
@@ -210,10 +228,8 @@
       document.getElementById('userName').textContent = col;
       document.getElementById('resId').textContent = tId;
       document.getElementById('successView').style.display = 'block';
-    } catch (e) { alert("Error de red"); btn.disabled = false; }
+    } catch (e) { alert("Error"); btn.disabled = false; }
   }
-  
-  // Iniciar prioridad en Normal
   updatePriority();
 </script>
 </body>

@@ -12,14 +12,13 @@
     --text-secondary: #8b9bb4; --border-subtle: rgba(0, 229, 255, 0.1); 
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow-x: hidden; padding: 20px; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0, 123, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 123, 255, 0.02) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
+  body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
 
   .container { width: 100%; max-width: 550px; z-index: 1; }
-  .form-card { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 40px; border-radius: 8px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-top: 4px solid var(--accent-blue); }
+  .form-card { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 40px; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-top: 4px solid var(--accent-blue); }
   
   .header { text-align: center; margin-bottom: 30px; }
-  .header h1 { font-family: 'Orbitron'; font-size: 1.8rem; letter-spacing: 4px; color: white; text-transform: uppercase; }
+  .header h1 { font-family: 'Orbitron'; font-size: 1.8rem; letter-spacing: 4px; text-transform: uppercase; }
   .header h1 span { color: var(--accent-blue); }
 
   .form-group { margin-bottom: 20px; }
@@ -28,8 +27,29 @@
   .form-select, .form-textarea { 
     width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); 
     padding: 12px; color: white; font-family: 'Rajdhani'; font-size: 15px; outline: none; border-radius: 4px;
-    transition: 0.3s;
   }
+
+  /* CAJAS DE EXPLICACIÓN DINÁMICA */
+  .info-box { 
+    margin-top: 10px; padding: 12px; border-radius: 4px; font-size: 12px; 
+    font-family: 'Share Tech Mono'; display: none; line-height: 1.4;
+    animation: fadeIn 0.3s ease;
+  }
+  .info-prev { background: rgba(0, 255, 163, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); }
+  .info-corr { background: rgba(255, 179, 0, 0.1); border: 1px solid var(--accent-amber); color: var(--accent-amber); }
+
+  /* BARRA DE PRIORIDAD (SLIDER) */
+  .priority-container { background: #05070a; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 8px; margin: 25px 0; text-align: center; }
+  .priority-slider { -webkit-appearance: none; width: 100%; height: 8px; background: #1a1d2d; outline: none; border-radius: 10px; margin: 15px 0; }
+  .priority-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: #fff; cursor: pointer; border-radius: 50%; box-shadow: 0 0 15px rgba(255,255,255,0.4); border: 2px solid var(--accent-blue); }
+
+  .priority-labels { display: flex; justify-content: space-between; padding: 0 10px; }
+  .p-label { font-family: 'Orbitron'; font-size: 9px; color: var(--text-secondary); transition: 0.3s; }
+  
+  /* ESTADOS DE LA BARRA */
+  .state-low { color: var(--accent-green) !important; text-shadow: 0 0 8px var(--accent-green); }
+  .state-mid { color: var(--accent-cyan) !important; text-shadow: 0 0 8px var(--accent-cyan); }
+  .state-high { color: var(--accent-red) !important; text-shadow: 0 0 10px var(--accent-red); font-weight: bold; }
 
   .btn-submit { 
     width: 100%; padding: 20px; background: var(--accent-blue); border: none; 
@@ -38,11 +58,8 @@
   }
   .btn-submit:hover { background: #0056b3; box-shadow: 0 0 30px rgba(0, 123, 255, 0.4); }
 
-  /* VISTA DE ÉXITO */
-  #successView { display: none; text-align: center; animation: fadeIn 0.6s ease forwards; }
-  .success-icon { font-size: 50px; color: var(--accent-green); margin-bottom: 20px; }
+  #successView { display: none; text-align: center; animation: fadeIn 0.5s ease; }
   .id-badge { background: #001a14; color: var(--accent-green); padding: 15px 30px; border-radius: 4px; font-family: 'Share Tech Mono'; font-size: 22px; border: 1px solid var(--accent-green); display: inline-block; margin: 20px 0; }
-  .success-msg { font-size: 16px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 30px; }
   
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
@@ -66,6 +83,17 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label class="form-label">⚙️ TIPO DE GESTIÓN</label>
+        <select id="gestion" class="form-select" onchange="explainGestion()">
+          <option value="">Seleccionar...</option>
+          <option value="Preventivo">Mantenimiento Preventivo</option>
+          <option value="Correctivo">Mantenimiento Correctivo</option>
+        </select>
+        <div id="infoPrev" class="info-box info-prev">🛡️ <strong>SISTEMA PROACTIVO:</strong> Se solicita para evitar fallos futuros (limpieza, revisión de rutina, actualizaciones).</div>
+        <div id="infoCorr" class="info-box info-corr">🛠️ <strong>SISTEMA REACTIVO:</strong> Se solicita porque algo YA falló y necesita reparación inmediata.</div>
+      </div>
+
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
         <div class="form-group">
           <label class="form-label">🖥️ DISPOSITIVO</label>
@@ -76,44 +104,38 @@
             <option>Impresora</option>
             <option>Router / Switch</option>
             <option>Teléfono IP</option>
-            <option>CCTV / Cámaras</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">⚠️ FALLA ESPECÍFICA</label>
+          <label class="form-label">⚠️ FALLA</label>
           <select id="falla" class="form-select" disabled><option value="">Esperando...</option></select>
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">⚙️ TIPO DE GESTIÓN</label>
-        <select id="gestion" class="form-select">
-          <option value="">Seleccionar...</option>
-          <option value="Preventivo">Mantenimiento Preventivo</option>
-          <option value="Correctivo">Mantenimiento Correctivo</option>
-        </select>
+      <div class="priority-container">
+        <label class="form-label">NIVEL DE URGENCIA</label>
+        <input type="range" min="1" max="3" value="2" class="priority-slider" id="pSlider" oninput="updatePriority()">
+        <div class="priority-labels">
+          <span class="p-label" id="lbl1">BAJA</span>
+          <span class="p-label state-mid" id="lbl2">NORMAL</span>
+          <span class="p-label" id="lbl3">ALTA</span>
+        </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">📝 NOTAS TÉCNICAS</label>
-        <textarea id="descripcion" class="form-textarea" rows="2" placeholder="Detalles del problema..."></textarea>
+        <label class="form-label">📝 DETALLES</label>
+        <textarea id="descripcion" class="form-textarea" rows="2" placeholder="Notas adicionales..."></textarea>
       </div>
 
       <button class="btn-submit" id="btnSend" onclick="sendTicket()">ENVIAR REPORTE</button>
     </div>
 
     <div id="successView">
-      <div class="success-icon">✔</div>
       <h2 style="font-family:'Orbitron'; color: white;">RECIBIDO</h2>
-      <p class="success-msg">
-        Gracias, <span id="userNameSuccess" style="color:var(--accent-cyan); font-weight:bold;"></span>.<br>
-        Su reporte ha sido procesado con éxito.
-      </p>
+      <p style="margin-top:15px; color:var(--text-secondary);">Gracias, <span id="userName" style="color:var(--accent-cyan)"></span>. Reporte registrado.</p>
       <div class="id-badge" id="resId"></div>
-      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 25px;">
-        El equipo de TI se pondrá en contacto con usted a la brevedad posible.
-      </p>
-      <button onclick="location.reload()" style="background:transparent; border:1px solid var(--accent-blue); color:var(--accent-blue); padding:10px 20px; cursor:pointer; font-family:'Orbitron'; border-radius:4px; font-size:11px;">NUEVO REPORTE</button>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">El equipo de TI se pondrá en contacto pronto.</p>
+      <button onclick="location.reload()" style="background:none; border:1px solid var(--accent-blue); color:var(--accent-blue); padding:10px 20px; cursor:pointer; font-family:'Orbitron';">NUEVO REPORTE</button>
     </div>
   </div>
 </div>
@@ -121,14 +143,33 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
   
-  // FALLAS DETALLADAS POR DISPOSITIVO
+  // EXPLICACIÓN DE GESTIÓN
+  function explainGestion() {
+    const v = document.getElementById('gestion').value;
+    document.getElementById('infoPrev').style.display = (v === 'Preventivo') ? 'block' : 'none';
+    document.getElementById('infoCorr').style.display = (v === 'Correctivo') ? 'block' : 'none';
+  }
+
+  // LÓGICA DE LA BARRA DE PRIORIDAD
+  function updatePriority() {
+    const val = document.getElementById('pSlider').value;
+    const l1 = document.getElementById('lbl1');
+    const l2 = document.getElementById('lbl2');
+    const l3 = document.getElementById('lbl3');
+    
+    l1.className = 'p-label'; l2.className = 'p-label'; l3.className = 'p-label';
+
+    if(val == 1) l1.classList.add('state-low');
+    else if(val == 2) l2.classList.add('state-mid');
+    else if(val == 3) l3.classList.add('state-high');
+  }
+
   const FAULTS = {
-    'PC Escritorio': ['No enciende', 'Pantalla Azul (BSOD)', 'Lento / Se pega', 'Falla de Disco Duro'],
-    'Laptop': ['No carga batería', 'Teclado no responde', 'Pantalla quebrada', 'Sobrecalentamiento'],
-    'Impresora': ['Atasco de papel', 'Mancha las hojas', 'Error de Tóner/Tinta', 'No detectada en red'],
-    'Router / Switch': ['Sin acceso a Internet', 'Wi-Fi inestable', 'Puerto físico dañado', 'Caída de segmento'],
-    'Teléfono IP': ['Sin tono de llamada', 'Pantalla apagada', 'Audio distorsionado', 'Error de registro'],
-    'CCTV / Cámaras': ['Cámara fuera de línea', 'Imagen borrosa', 'Falla de grabación', 'Problema con NVR/DVR']
+    'PC Escritorio': ['No enciende', 'Pantalla Azul', 'Lento', 'Falla Periféricos'],
+    'Laptop': ['Batería no carga', 'Teclado falla', 'Pantalla rota', 'Wi-Fi'],
+    'Impresora': ['Atasco de papel', 'Sin tóner', 'No imprime', 'Error red'],
+    'Router / Switch': ['Sin Internet', 'Wi-Fi lento', 'Puerto dañado'],
+    'Teléfono IP': ['Sin audio', 'No registra', 'Pantalla negra']
   };
 
   function loadFaults() {
@@ -146,11 +187,13 @@
     const ges = document.getElementById('gestion').value;
     const dev = document.getElementById('dispositivo').value;
     const fal = document.getElementById('falla').value;
+    const pVal = document.getElementById('pSlider').value;
+    const prio = ["Baja", "Normal", "Alta"][pVal-1];
 
-    if (!col || !ges || !dev || !fal) { alert("⚠️ Mae, rellene todos los campos."); return; }
+    if (!col || !ges || !dev || !fal) { alert("⚠️ Rellene los campos, mae."); return; }
 
     const btn = document.getElementById('btnSend');
-    btn.disabled = true; btn.textContent = "ENVIANDO...";
+    btn.disabled = true; btn.textContent = "PROCESANDO...";
 
     const tId = "TK-" + Math.random().toString(36).substr(2, 6).toUpperCase();
 
@@ -160,15 +203,18 @@
         body: JSON.stringify({
           action: "add", id: tId, colaborador: col, gestion: ges,
           dispositivo: dev, falla: fal, descripcion: document.getElementById('descripcion').value,
-          fechaDisplay: new Date().toLocaleString(), estado: "Pendiente", prioridad: "Normal"
+          fechaDisplay: new Date().toLocaleString(), estado: "Pendiente", prioridad: prio
         })
       });
       document.getElementById('formView').style.display = 'none';
-      document.getElementById('userNameSuccess').textContent = col;
+      document.getElementById('userName').textContent = col;
       document.getElementById('resId').textContent = tId;
       document.getElementById('successView').style.display = 'block';
     } catch (e) { alert("Error de red"); btn.disabled = false; }
   }
+  
+  // Iniciar prioridad en Normal
+  updatePriority();
 </script>
 </body>
 </html>

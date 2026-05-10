@@ -4,6 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IT HELP DESK — Soporte Técnico</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root { 
     --bg-primary: #030508; --bg-card: #0a0e17; --bg-input: #05070a; 
@@ -107,10 +108,10 @@
           <option value="Correctivo">Correctivo (Reparación)</option>
         </select>
         <div id="infoPrev" class="info-box info-prev">
-          <strong>🛡️ MANTENIMIENTO PREVENTIVO:</strong> Se realiza para evitar fallas futuras. Ej: Limpiezas, actualizaciones o revisiones de rutina.
+          <strong>🛡️ MANTENIMIENTO PREVENTIVO:</strong> Tareas para evitar fallas futuras. Ej: Limpiezas o revisiones de rutina.
         </div>
         <div id="infoCorr" class="info-box info-corr">
-          <strong>🛠️ MANTENIMIENTO CORRECTIVO:</strong> Se realiza porque algo ya falló y necesita reparación inmediata para volver a funcionar.
+          <strong>🛠️ MANTENIMIENTO CORRECTIVO:</strong> Reparación de una falla que ya ocurrió y bloquea el trabajo.
         </div>
       </div>
 
@@ -168,7 +169,6 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
   
-  // FUNCIÓN PARA EXPLICAR GESTIÓN
   function explainGestion() {
     const val = document.getElementById('gestion').value;
     document.getElementById('infoPrev').style.display = (val === 'Preventivo') ? 'block' : 'none';
@@ -205,13 +205,13 @@
 
   async function sendTicket() {
     const col = document.getElementById('colaborador').value;
-    const ges = document.getElementById('gestion').value; // Jalar valor de gestión
+    const ges = document.getElementById('gestion').value;
     const dev = document.getElementById('dispositivo').value;
     const fal = document.getElementById('falla').value;
     const pVal = document.getElementById('pSlider').value;
     const prioridades = ["Baja", "Normal", "Alta"];
 
-    if (!col || !ges || !dev || !fal) { alert("⚠️ Mae, rellene todos los campos (incluyendo el tipo de gestión)."); return; }
+    if (!col || !ges || !dev || !fal) { alert("⚠️ Seleccione el nombre y el tipo de gestión."); return; }
 
     const btn = document.getElementById('btnSend');
     btn.disabled = true; btn.textContent = "ENVIANDO DATOS...";

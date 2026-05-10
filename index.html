@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT HELP DESK — Soporte Técnico</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root { 
+    --bg-primary: #030508; --bg-card: #0a0e17; --bg-input: #05070a; 
+    --accent-blue: #007bff; --accent-cyan: #00e5ff; --accent-green: #00ffa3; 
+    --accent-red: #ff3d6b; --accent-amber: #ffb300; --text-primary: #f0f5ff; 
+    --text-secondary: #8b9bb4; --border-subtle: rgba(0, 229, 255, 0.1); 
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow-x: hidden; padding: 20px; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0, 123, 255, 0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.01) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
+
+  .container { width: 100%; max-width: 550px; z-index: 1; }
+  .form-card { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 40px; border-radius: 8px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-top: 4px solid var(--accent-blue); }
+  
+  .header { text-align: center; margin-bottom: 30px; }
+  .header h1 { font-family: 'Orbitron'; font-size: 1.8rem; letter-spacing: 4px; color: white; text-transform: uppercase; }
+  .header h1 span { color: var(--accent-blue); }
+
+  .form-group { margin-bottom: 20px; }
+  .form-label { display: block; font-size: 10px; font-family: 'Orbitron'; color: var(--accent-blue); margin-bottom: 12px; letter-spacing: 2px; text-transform: uppercase; }
+  
+  .form-input, .form-select, .form-textarea { 
+    width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); 
+    padding: 12px; color: white; font-family: 'Rajdhani'; font-size: 15px; outline: none; border-radius: 4px;
+  }
+
+  /* Selector de Urgencia */
+  .priority-container {
+    background: #05070a; border: 1px solid var(--border-subtle);
+    padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center;
+  }
+  .priority-slider {
+    -webkit-appearance: none; width: 100%; height: 6px; background: #1a1d2d;
+    outline: none; border-radius: 10px; margin: 15px 0;
+  }
+  .priority-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 20px; height: 20px;
+    background: var(--text-primary); cursor: pointer; border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255,255,255,0.5); transition: 0.3s;
+  }
+
+  .priority-labels { display: flex; justify-content: space-between; padding: 0 5px; }
+  .p-label { font-family: 'Share Tech Mono'; font-size: 10px; color: var(--text-secondary); transition: 0.3s; }
+  
+  .state-low { color: var(--accent-green) !important; text-shadow: 0 0 10px var(--accent-green); }
+  .state-mid { color: var(--accent-cyan) !important; text-shadow: 0 0 10px var(--accent-cyan); }
+  .state-high { color: var(--accent-red) !important; text-shadow: 0 0 10px var(--accent-red); animation: shake 0.2s infinite; }
+
+  @keyframes shake { 0% { transform: translateX(0); } 50% { transform: translateX(1px); } 100% { transform: translateX(0); } }
+
+  .btn-submit { 
+    width: 100%; padding: 18px; background: transparent; border: 1px solid var(--accent-green); 
+    color: var(--accent-green); font-family: 'Orbitron'; font-weight: 700; cursor: pointer; 
+    text-transform: uppercase; letter-spacing: 3px; border-radius: 4px;
+  }
+  .btn-submit:hover:not(:disabled) { background: var(--accent-green); color: black; box-shadow: 0 0 25px rgba(0, 255, 163, 0.5); }
+
+  /* Pantalla de Éxito */
+  #successView { display: none; text-align: center; animation: fadeIn 0.5s ease; }
+  .success-icon { font-size: 50px; color: var(--accent-green); margin-bottom: 20px; }
+  .id-label { font-family: 'Orbitron'; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; display: block; }
+  .id-badge { background: #001a14; color: var(--accent-green); padding: 12px 25px; border-radius: 4px; font-family: 'Share Tech Mono'; font-size: 20px; border: 1px solid var(--accent-green); display: inline-block; margin-bottom: 20px; }
+  
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header"><h1>IT <span>HELP</span> DESK</h1></div>
+
+  <div class="form-card">
+    <div id="formView">
+      <div class="form-group">
+        <label class="form-label">👤 COLABORADOR</label>
+        <input type="text" id="colaborador" class="form-input" placeholder="Nombre completo" autocomplete="off">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div class="form-group">
+          <label class="form-label">🖥️ DISPOSITIVO</label>
+          <select id="dispositivo" class="form-select" onchange="loadFaults()">
+            <option value="">Seleccionar...</option>
+            <option>PC Escritorio</option>
+            <option>Laptop</option>
+            <option>Teléfono Móvil</option>
+            <option>Impresora</option>
+            <option>Router / Switch</option>
+            <option>Software / OS</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">⚠️ FALLA</label>
+          <select id="falla" class="form-select" disabled><option value="">Esperando...</option></select>
+        </div>
+      </div>
+
+      <div class="priority-container">
+        <label class="form-label">NIVEL DE URGENCIA</label>
+        <input type="range" min="1" max="3" value="2" class="priority-slider" id="pSlider" oninput="updatePriority()">
+        <div class="priority-labels">
+          <span class="p-label" id="lbl1">BAJA</span>
+          <span class="p-label state-mid" id="lbl2">MEDIA</span>
+          <span class="p-label" id="lbl3">ALTA</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">📝 DESCRIPCIÓN</label>
+        <textarea id="descripcion" class="form-textarea" rows="2" placeholder="Detalles del problema..."></textarea>
+      </div>
+
+      <button class="btn-submit" id="btnSend" onclick="sendTicket()">ENVIAR REPORTE</button>
+    </div>
+
+    <div id="successView">
+      <div class="success-icon">✔</div>
+      <h2 style="font-family:'Orbitron'; margin-bottom:15px; color: white;">¡RECIBIDO!</h2>
+      <p style="color:var(--text-secondary); font-size:14px; line-height: 1.6; margin-bottom: 20px;">
+        Gracias <span id="resUser" style="color:var(--accent-cyan); font-weight:bold;"></span>.<br>
+        <strong style="color: white;">Pronto será contactado por un profesional de TI.</strong>
+      </p>
+      <span class="id-label">SU TICKET ES :</span>
+      <div class="id-badge" id="resId"></div>
+      <button onclick="location.reload()" style="display:block; width:100%; background:none; border:1px solid var(--accent-blue); color:var(--accent-blue); padding:12px; cursor:pointer; font-family:'Orbitron'; border-radius:4px; font-weight: bold;">NUEVO REPORTE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
+  
+  const FAULTS = {
+    'PC Escritorio': ['No enciende / Sin energía', 'Pantalla azul (BSOD)', 'Lento / Se queda pegado', 'Falla de teclado o mouse', 'USB no funciona', 'Ruidos extraños'],
+    'Laptop': ['No carga / Batería dañada', 'Pantalla rota / Rayas', 'Teclado no responde', 'Touchpad bloqueado', 'Wi-Fi no conecta', 'Sobrecalentamiento'],
+    'Teléfono Móvil': ['Pantalla quebrada / Táctil', 'Batería no carga', 'Apps se cierran solas', 'Sin señal de red / SIM', 'Cámara no funciona', 'Audio dañado'],
+    'Impresora': ['Atasco de papel', 'Tóner o tinta agotada', 'Mancha las hojas', 'No aparece en la red', 'Luz roja de error', 'Escáner no funciona'],
+    'Router / Switch': ['Sin acceso a internet', 'Señal Wi-Fi muy débil', 'Puerto físico dañado', 'Cable de red roto', 'Router se reinicia solo'],
+    'Software / OS': ['Usuario bloqueado / Contraseña', 'Error al abrir Office', 'Windows no actualiza', 'Alerta de Virus / Malware', 'Outlook no sincroniza', 'Licencia expirada']
+  };
+
+  function updatePriority() {
+    const val = document.getElementById('pSlider').value;
+    const labels = [document.getElementById('lbl1'), document.getElementById('lbl2'), document.getElementById('lbl3')];
+    labels.forEach(l => l.className = 'p-label');
+    if(val == 1) labels[0].classList.add('state-low');
+    else if(val == 2) labels[1].classList.add('state-mid');
+    else labels[2].classList.add('state-high');
+  }
+
+  function loadFaults() {
+    const d = document.getElementById('dispositivo').value;
+    const f = document.getElementById('falla');
+    f.innerHTML = '<option value="">Seleccionar falla...</option>';
+    if (FAULTS[d]) {
+      FAULTS[d].forEach(x => { let o = document.createElement('option'); o.value = o.textContent = x; f.appendChild(o); });
+      f.disabled = false;
+    } else { f.disabled = true; }
+  }
+
+  async function sendTicket() {
+    const col = document.getElementById('colaborador').value.trim();
+    const dev = document.getElementById('dispositivo').value;
+    const fal = document.getElementById('falla').value;
+    const pVal = document.getElementById('pSlider').value;
+    const prioridades = ["Baja", "Normal", "Alta"];
+
+    if (!col || !dev || !fal) { alert("⚠️ Mae, rellene todo el formulario."); return; }
+
+    const btn = document.getElementById('btnSend');
+    btn.disabled = true; btn.textContent = "ENVIANDO DATOS...";
+
+    const tId = "TK-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST", mode: "no-cors",
+        body: JSON.stringify({
+          action: "add", id: tId, colaborador: col, gestion: "Soporte",
+          dispositivo: dev, falla: fal, descripcion: document.getElementById('descripcion').value,
+          fechaDisplay: new Date().toLocaleString('es-CR'), estado: "Pendiente",
+          prioridad: prioridades[pVal-1]
+        })
+      });
+
+      document.getElementById('formView').style.display = 'none';
+      document.getElementById('resUser').textContent = col;
+      document.getElementById('resId').textContent = tId;
+      document.getElementById('successView').style.display = 'block';
+    } catch (e) { alert("Error de conexión"); btn.disabled = false; }
+  }
+</script>
+</body>
+</html>

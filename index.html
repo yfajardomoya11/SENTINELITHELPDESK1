@@ -30,6 +30,17 @@
     padding: 12px; color: white; font-family: 'Rajdhani'; font-size: 15px; outline: none; border-radius: 4px;
   }
 
+  /* --- CAJAS DE EXPLICACIÓN DINÁMICA --- */
+  .info-box { 
+    margin-top: 10px; padding: 12px; border-radius: 4px; font-size: 11px; 
+    font-family: 'Share Tech Mono'; display: none; line-height: 1.5;
+    animation: slideDown 0.3s ease;
+  }
+  .info-prev { background: rgba(0, 229, 255, 0.05); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); }
+  .info-corr { background: rgba(255, 179, 0, 0.05); border: 1px solid var(--accent-amber); color: var(--accent-amber); }
+  
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
   /* Selector de Urgencia */
   .priority-container {
     background: #05070a; border: 1px solid var(--border-subtle);
@@ -61,7 +72,6 @@
   }
   .btn-submit:hover:not(:disabled) { background: var(--accent-green); color: black; box-shadow: 0 0 25px rgba(0, 255, 163, 0.5); }
 
-  /* Pantalla de Éxito */
   #successView { display: none; text-align: center; animation: fadeIn 0.5s ease; }
   .success-icon { font-size: 50px; color: var(--accent-green); margin-bottom: 20px; }
   .id-label { font-family: 'Orbitron'; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; display: block; }
@@ -87,6 +97,21 @@
           <option value="Hulk">Hulk</option>
           <option value="Batman">Batman</option>
         </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">⚙️ TIPO DE GESTIÓN</label>
+        <select id="gestion" class="form-select" onchange="explainGestion()">
+          <option value="">Seleccionar tipo...</option>
+          <option value="Preventivo">Preventivo (Escudo)</option>
+          <option value="Correctivo">Correctivo (Reparación)</option>
+        </select>
+        <div id="infoPrev" class="info-box info-prev">
+          <strong>🛡️ MANTENIMIENTO PREVENTIVO:</strong> Se realiza para evitar fallas futuras. Ej: Limpiezas, actualizaciones o revisiones de rutina.
+        </div>
+        <div id="infoCorr" class="info-box info-corr">
+          <strong>🛠️ MANTENIMIENTO CORRECTIVO:</strong> Se realiza porque algo ya falló y necesita reparación inmediata para volver a funcionar.
+        </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -143,6 +168,13 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
   
+  // FUNCIÓN PARA EXPLICAR GESTIÓN
+  function explainGestion() {
+    const val = document.getElementById('gestion').value;
+    document.getElementById('infoPrev').style.display = (val === 'Preventivo') ? 'block' : 'none';
+    document.getElementById('infoCorr').style.display = (val === 'Correctivo') ? 'block' : 'none';
+  }
+
   const FAULTS = {
     'PC Escritorio': ['No enciende / Sin energía', 'Pantalla azul (BSOD)', 'Lento / Se queda pegado', 'Falla de teclado o mouse', 'USB no funciona', 'Ruidos extraños'],
     'Laptop': ['No carga / Batería dañada', 'Pantalla rota / Rayas', 'Teclado no responde', 'Touchpad bloqueado', 'Wi-Fi no conecta', 'Sobrecalentamiento'],
@@ -173,12 +205,13 @@
 
   async function sendTicket() {
     const col = document.getElementById('colaborador').value;
+    const ges = document.getElementById('gestion').value; // Jalar valor de gestión
     const dev = document.getElementById('dispositivo').value;
     const fal = document.getElementById('falla').value;
     const pVal = document.getElementById('pSlider').value;
     const prioridades = ["Baja", "Normal", "Alta"];
 
-    if (!col || !dev || !fal) { alert("⚠️ Mae, seleccione todos los campos."); return; }
+    if (!col || !ges || !dev || !fal) { alert("⚠️ Mae, rellene todos los campos (incluyendo el tipo de gestión)."); return; }
 
     const btn = document.getElementById('btnSend');
     btn.disabled = true; btn.textContent = "ENVIANDO DATOS...";
@@ -189,7 +222,7 @@
       await fetch(SCRIPT_URL, {
         method: "POST", mode: "no-cors",
         body: JSON.stringify({
-          action: "add", id: tId, colaborador: col, gestion: "Soporte",
+          action: "add", id: tId, colaborador: col, gestion: ges,
           dispositivo: dev, falla: fal, descripcion: document.getElementById('descripcion').value,
           fechaDisplay: new Date().toLocaleString('es-CR'), estado: "Pendiente",
           prioridad: prioridades[pVal-1]
@@ -204,5 +237,4 @@
   }
 </script>
 </body>
-</html>
 </html>

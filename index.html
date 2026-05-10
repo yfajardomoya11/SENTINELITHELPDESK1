@@ -39,15 +39,20 @@
   .priority-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: #fff; cursor: pointer; border-radius: 50%; border: 2px solid var(--accent-blue); }
 
   .p-label { font-family: 'Orbitron'; font-size: 9px; color: var(--text-secondary); transition: 0.3s; }
-  .state-low { color: var(--accent-green) !important; text-shadow: 0 0 8px var(--accent-green); }
-  .state-mid { color: var(--accent-cyan) !important; text-shadow: 0 0 8px var(--accent-cyan); }
-  .state-high { color: var(--accent-red) !important; text-shadow: 0 0 10px var(--accent-red); font-weight: bold; }
+  .state-low { color: var(--accent-green) !important; }
+  .state-mid { color: var(--accent-cyan) !important; }
+  .state-high { color: var(--accent-red) !important; font-weight: bold; }
 
   .btn-submit { width: 100%; padding: 20px; background: var(--accent-blue); border: none; color: white; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 4px; border-radius: 4px; transition: 0.3s; }
   .btn-submit:hover { background: #0056b3; box-shadow: 0 0 30px rgba(0, 123, 255, 0.4); }
 
-  #successView { display: none; text-align: center; }
-  .id-badge { background: #001a14; color: var(--accent-green); padding: 15px 30px; border-radius: 4px; font-family: 'Share Tech Mono'; font-size: 22px; border: 1px solid var(--accent-green); display: inline-block; margin: 20px 0; }
+  /* VISTA DE ÉXITO CON CHECK AZUL */
+  #successView { display: none; text-align: center; animation: fadeIn 0.5s ease; }
+  .check-container { width: 80px; height: 80px; background: rgba(0, 123, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--accent-blue); box-shadow: 0 0 20px rgba(0, 123, 255, 0.2); }
+  .check-icon { font-size: 40px; color: var(--accent-blue); text-shadow: 0 0 10px var(--accent-blue); }
+  .id-badge { background: #050a14; color: var(--accent-cyan); padding: 15px 30px; border-radius: 4px; font-family: 'Share Tech Mono'; font-size: 22px; border: 1px solid var(--accent-blue); display: inline-block; margin: 20px 0; }
+  
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -76,7 +81,7 @@
           <option value="Preventivo">Mantenimiento Preventivo</option>
           <option value="Correctivo">Mantenimiento Correctivo</option>
         </select>
-        <div id="infoPrev" class="info-box info-prev">🛡️ <strong>PREVENTIVO:</strong> Tareas para evitar fallos futuros.</div>
+        <div id="infoPrev" class="info-box info-prev">🛡️ <strong>PREVENTIVO:</strong> Tareas proactivas para evitar fallos futuros.</div>
         <div id="infoCorr" class="info-box info-corr">🛠️ <strong>CORRECTIVO:</strong> Reparación de una falla existente.</div>
       </div>
 
@@ -118,11 +123,14 @@
     </div>
 
     <div id="successView">
-      <h2 style="font-family:'Orbitron'; color: white;">RECIBIDO</h2>
-      <p style="margin-top:15px; color:var(--text-secondary);">Gracias, <span id="userName" style="color:var(--accent-cyan)"></span>. Reporte registrado.</p>
+      <div class="check-container">
+        <div class="check-icon">✓</div>
+      </div>
+      <h2 style="font-family:'Orbitron'; color: white; letter-spacing: 2px;">RECIBIDO</h2>
+      <p style="margin-top:15px; color:var(--text-secondary);">Gracias, <span id="userName" style="color:var(--accent-cyan)"></span>. Su reporte ha sido registrado.</p>
       <div class="id-badge" id="resId"></div>
-      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">El equipo de TI se pondrá en contacto pronto.</p>
-      <button onclick="location.reload()" style="background:none; border:1px solid var(--accent-blue); color:var(--accent-blue); padding:10px 20px; cursor:pointer; font-family:'Orbitron';">NUEVO REPORTE</button>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">El equipo de TI se pondrá en contacto pronto para la resolución del incidente.</p>
+      <button onclick="location.reload()" style="background:none; border:1px solid var(--accent-blue); color:var(--accent-blue); padding:12px 25px; cursor:pointer; font-family:'Orbitron'; font-size: 10px; border-radius: 4px; letter-spacing: 1px;">NUEVO REPORTE</button>
     </div>
   </div>
 </div>
@@ -145,50 +153,13 @@
     else if(val == 3) l3.classList.add('state-high');
   }
 
-  // CATÁLOGO DE FALLAS QUIRÚRGICAS
   const FAULTS = {
-    'PC Escritorio': [
-      'No enciende (Falla de fuente)',
-      'Reinicio constante (Loop)',
-      'Pantallazo azul / Error crítico',
-      'Puerto USB / Video no funciona',
-      'Lentitud extrema / Disco al 100%'
-    ],
-    'Laptop': [
-      'Batería no retiene carga',
-      'Pantalla parpadea / Rayas',
-      'Touchpad / Teclado pegado',
-      'No detecta redes Wi-Fi',
-      'Calentamiento excesivo (Ventilador)'
-    ],
-    'Impresora': [
-      'Atasco de papel constante',
-      'Líneas negras en impresión',
-      'No detectada en la red (IP)',
-      'Error de tóner / Tambor',
-      'Escaneo no llega al destino'
-    ],
-    'Router / Switch': [
-      'Puertos físicos sin señal',
-      'Cortes intermitentes de red',
-      'Configuración de VLAN perdida',
-      'Equipo bloqueado (No responde)',
-      'Velocidad limitada (Autonegociación)'
-    ],
-    'Teléfono Móvil': [
-      'Pantalla táctil errática',
-      'Problema de carga (Puerto C)',
-      'Apps corporativas no abren',
-      'Batería se descarga rápido',
-      'No sincroniza correo / MFA'
-    ],
-    'Periféricos': [
-      'Mouse con doble clic / Sensor',
-      'Monitor sin imagen (Backlight)',
-      'Cámara desenfocada / No detectada',
-      'Teclado con teclas omitidas',
-      'Audio con ruido / Diadema rota'
-    ]
+    'PC Escritorio': ['No enciende (Fuente)', 'Reinicio constante', 'Pantallazo azul', 'Puerto USB dañado', 'Lentitud extrema'],
+    'Laptop': ['Batería no carga', 'Pantalla parpadea', 'Teclado pegado', 'No detecta Wi-Fi', 'Calentamiento'],
+    'Impresora': ['Atasco de papel', 'Líneas negras', 'No detectada IP', 'Error tóner', 'Falla de escaneo'],
+    'Router / Switch': ['Puertos sin señal', 'Cortes de red', 'VLAN perdida', 'Equipo bloqueado', 'Lentitud LAN'],
+    'Teléfono Móvil': ['Táctil errático', 'Puerto carga C', 'Apps no abren', 'Batería inflada', 'Falla MFA/Correo'],
+    'Periféricos': ['Mouse doble clic', 'Monitor sin imagen', 'Cámara desenfocada', 'Teclas omitidas', 'Audio ruidoso']
   };
 
   function loadFaults() {
@@ -206,13 +177,12 @@
     const ges = document.getElementById('gestion').value;
     const dev = document.getElementById('dispositivo').value;
     const fal = document.getElementById('falla').value;
-    const pVal = document.getElementById('pSlider').value;
-    const prio = ["Baja", "Normal", "Alta"][pVal-1];
+    const prio = ["Baja", "Normal", "Alta"][document.getElementById('pSlider').value-1];
 
-    if (!col || !ges || !dev || !fal) { alert("⚠️ Mae, rellene todo."); return; }
+    if (!col || !ges || !dev || !fal) { alert("⚠️ Complete todos los campos."); return; }
 
     const btn = document.getElementById('btnSend');
-    btn.disabled = true; btn.textContent = "ENVIANDO...";
+    btn.disabled = true; btn.textContent = "ENVIANDO REPORTE...";
     const tId = "TK-" + Math.random().toString(36).substr(2, 6).toUpperCase();
 
     try {
@@ -228,9 +198,10 @@
       document.getElementById('userName').textContent = col;
       document.getElementById('resId').textContent = tId;
       document.getElementById('successView').style.display = 'block';
-    } catch (e) { alert("Error"); btn.disabled = false; }
+    } catch (e) { alert("Error de conexión"); btn.disabled = false; }
   }
   updatePriority();
 </script>
 </body>
+</html>
 </html>

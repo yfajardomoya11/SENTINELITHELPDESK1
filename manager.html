@@ -1,225 +1,333 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IT COMMAND CENTER v4.0</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT COMMAND CENTER v4.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    
+    <style>
+        :root { 
+            --bg-primary: #020406; --bg-sidebar: rgba(6, 11, 20, 0.98); --bg-card: #0a0e17; 
+            --accent-blue: #007bff; --accent-cyan: #00e5ff; --accent-green: #00ffa3;
+            --accent-purple: #9d50bb; --accent-red: #ff3d6b; --accent-amber: #ffb300;
+            --text-primary: #f0f5ff; --text-secondary: #8b9bb4; --border-subtle: rgba(0, 229, 255, 0.15); 
+            --sidebar-expanded: 300px; --sidebar-collapsed: 80px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; display: flex; overflow-x: hidden; min-height: 100vh; }
+        
+        body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0, 123, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 123, 255, 0.03) 1px, transparent 1px); background-size: 35px 35px; pointer-events: none; z-index: 0; }
 
-<style>
-  :root { 
-    --bg-primary: #020406; --bg-sidebar: rgba(6, 11, 20, 0.98); --bg-card: #0a0e17; 
-    --accent-blue: #007bff; --accent-cyan: #00e5ff; --accent-green: #00ffa3;
-    --accent-purple: #9d50bb; --accent-red: #ff3d6b; --accent-amber: #ffb300;
-    --text-primary: #f0f5ff; --text-secondary: #8b9bb4; --border-subtle: rgba(0, 229, 255, 0.15); 
-    --sidebar-expanded: 300px; --sidebar-collapsed: 80px;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; display: flex; overflow-x: hidden; min-height: 100vh; }
-  
-  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0, 123, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 123, 255, 0.03) 1px, transparent 1px); background-size: 35px 35px; pointer-events: none; z-index: 0; }
+        /* LOGIN */
+        #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 50px; border-radius: 8px; width: 420px; text-align: center; border-top: 4px solid var(--accent-blue); }
+        .login-field { width: 100%; background: #050a14; border: 1px solid var(--border-subtle); padding: 15px; color: white; margin-bottom: 20px; outline: none; font-family: 'Share Tech Mono'; }
 
-  /* LOGIN */
-  #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-  .login-box { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 50px; border-radius: 8px; width: 420px; text-align: center; border-top: 4px solid var(--accent-blue); }
-  .login-field { width: 100%; background: #050a14; border: 1px solid var(--border-subtle); padding: 15px; color: white; margin-bottom: 20px; outline: none; font-family: 'Share Tech Mono'; }
+        /* SIDEBAR */
+        .sidebar { 
+            width: var(--sidebar-expanded); background: var(--bg-sidebar); backdrop-filter: blur(25px); 
+            border-right: 1px solid var(--border-subtle); height: 100vh; position: fixed; left: 0; top: 0; 
+            z-index: 1000; display: none; flex-direction: column; transition: width 0.3s ease; overflow: hidden;
+        }
+        .sidebar.collapsed { width: var(--sidebar-collapsed); }
+        .sidebar-header { padding: 30px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); font-family: 'Orbitron'; color: var(--accent-cyan); font-size: 10px; }
+        
+        .user-card { margin: 25px 15px; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--accent-purple); background: linear-gradient(135deg, rgba(157, 80, 187, 0.1), transparent); }
+        .sidebar.collapsed .user-info { display: none; }
+        .user-avatar { min-width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-weight: 900; border: 2px solid #fff; background: var(--accent-purple); }
 
-  /* SIDEBAR (IMAGEN 7) */
-  .sidebar { 
-    width: var(--sidebar-expanded); background: var(--bg-sidebar); backdrop-filter: blur(25px); 
-    border-right: 1px solid var(--border-subtle); height: 100vh; position: fixed; left: 0; top: 0; 
-    z-index: 1000; display: none; flex-direction: column; transition: width 0.3s ease; overflow: hidden;
-  }
-  .sidebar.collapsed { width: var(--sidebar-collapsed); }
-  .sidebar-header { padding: 30px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); font-family: 'Orbitron'; color: var(--accent-cyan); font-size: 10px; }
-  
-  .user-card { margin: 25px 15px; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--accent-purple); background: linear-gradient(135deg, rgba(157, 80, 187, 0.1), transparent); }
-  .sidebar.collapsed .user-info { display: none; }
-  .user-avatar { min-width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-weight: 900; border: 2px solid #fff; background: var(--accent-purple); }
+        .nav-item { padding: 20px 25px; color: var(--text-secondary); cursor: pointer; font-family: 'Orbitron'; font-size: 10px; transition: 0.2s; border-left: 3px solid transparent; display: flex; align-items: center; gap: 20px; white-space: nowrap; }
+        .sidebar.collapsed .nav-text { display: none; }
+        .nav-item:hover, .nav-item.active { background: rgba(0, 229, 255, 0.1); border-left-color: var(--accent-cyan); color: var(--accent-cyan); }
 
-  .nav-item { padding: 20px 25px; color: var(--text-secondary); cursor: pointer; font-family: 'Orbitron'; font-size: 10px; transition: 0.2s; border-left: 3px solid transparent; display: flex; align-items: center; gap: 20px; white-space: nowrap; }
-  .sidebar.collapsed .nav-text { display: none; }
-  .nav-item:hover, .nav-item.active { background: rgba(0, 229, 255, 0.1); border-left-color: var(--accent-cyan); color: var(--accent-cyan); }
+        /* MAIN */
+        .main-content { flex: 1; margin-left: var(--sidebar-expanded); padding: 40px; width: calc(100% - var(--sidebar-expanded)); transition: 0.3s ease; }
+        body.sidebar-is-collapsed .main-content { margin-left: var(--sidebar-collapsed); width: calc(100% - var(--sidebar-collapsed)); }
 
-  /* MAIN (IMAGEN 7) */
-  .main-content { flex: 1; margin-left: var(--sidebar-expanded); padding: 40px; width: calc(100% - var(--sidebar-expanded)); transition: 0.3s ease; }
-  body.sidebar-is-collapsed .main-content { margin-left: var(--sidebar-collapsed); width: calc(100% - var(--sidebar-collapsed)); }
+        /* KPIs */
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
+        .kpi-card { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 25px; border-radius: 8px; position: relative; }
+        .kpi-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--accent-blue); }
+        .kpi-val { font-family: 'Orbitron'; font-size: 2.2rem; font-weight: 900; color: #fff; display: block; margin-top: 10px; }
 
-  /* KPIs (IMAGEN 7) */
-  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
-  .kpi-card { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 25px; border-radius: 8px; position: relative; }
-  .kpi-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--accent-blue); }
-  .kpi-val { font-family: 'Orbitron'; font-size: 2.2rem; font-weight: 900; color: #fff; display: block; margin-top: 10px; }
+        /* CHARTS */
+        .charts-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+        .chart-box { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 20px; height: 380px; border-radius: 12px; }
+        .chart-box h4 { font-family: 'Orbitron'; font-size: 10px; color: var(--accent-cyan); margin-bottom: 20px; letter-spacing: 2px; }
 
-  /* CHARTS */
-  .charts-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 20px; margin-bottom: 40px; }
-  .chart-box { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 20px; height: 380px; border-radius: 12px; }
-  .chart-box h4 { font-family: 'Orbitron'; font-size: 10px; color: var(--accent-cyan); margin-bottom: 20px; letter-spacing: 2px; }
+        /* TABLA */
+        .table-container { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 18px; text-align: left; background: rgba(0, 123, 255, 0.05); color: var(--accent-blue); font-family: 'Share Tech Mono'; font-size: 11px; }
+        td { padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; color: var(--text-secondary); }
 
-  /* TABLA (IMAGEN 7) */
-  .table-container { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; }
-  th { padding: 18px; text-align: left; background: rgba(0, 123, 255, 0.05); color: var(--accent-blue); font-family: 'Share Tech Mono'; font-size: 11px; }
-  td { padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; color: var(--text-secondary); }
-
-  #modalObs { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:10000; align-items:center; justify-content:center; backdrop-filter:blur(15px); }
-  .modal-content { background:var(--bg-card); border:1px solid var(--accent-blue); padding:40px; width:500px; border-radius:12px; }
-</style>
+        #modalObs { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:10000; align-items:center; justify-content:center; backdrop-filter:blur(15px); }
+        .modal-content { background:var(--bg-card); border:1px solid var(--accent-blue); padding:40px; width:500px; border-radius:12px; }
+    </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-  <div class="login-box">
-    <h2 style="font-family:'Orbitron'; color:white; margin-bottom:30px;">IT HELP DESK <span>CONTROL</span></h2>
-    <input type="text" id="lUser" placeholder="ID OPERADOR" class="login-field" onkeypress="handleEnter(event)">
-    <input type="password" id="lPass" placeholder="SECURITY KEY" class="login-field" onkeypress="handleEnter(event)">
-    <button onclick="attemptLogin()" style="width:100%; padding:15px; background:var(--accent-blue); color:white; border:none; font-family:'Orbitron'; cursor:pointer; font-weight:bold;">AUTENTICAR SISTEMA</button>
-  </div>
+    <div class="login-box">
+        <h2 style="font-family:'Orbitron'; color:white; margin-bottom:30px;">IT HELP DESK <span>CONTROL</span></h2>
+        <input type="text" id="lUser" placeholder="ID OPERADOR" class="login-field" onkeypress="handleEnter(event)">
+        <input type="password" id="lPass" placeholder="SECURITY KEY" class="login-field" onkeypress="handleEnter(event)">
+        <button onclick="attemptLogin()" style="width:100%; padding:15px; background:var(--accent-blue); color:white; border:none; font-family:'Orbitron'; cursor:pointer; font-weight:bold;">AUTENTICAR SISTEMA</button>
+    </div>
 </div>
 
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <span class="nav-text">IT COMMAND v4.0</span>
-    <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="cursor:pointer; color:var(--accent-cyan);"></i>
-  </div>
-  <div class="user-card" id="profileCard">
-    <div class="user-avatar" id="userAvatar">--</div>
-    <div class="user-info">
-      <span class="name" id="displayUser" style="font-weight:700; font-size:13px; display:block;">---</span>
-      <span class="rank" id="displayRank" style="font-size:8px; font-family:'Orbitron'; color:var(--text-secondary);">---</span>
+    <div class="sidebar-header">
+        <span class="nav-text">IT COMMAND v4.0</span>
+        <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="cursor:pointer; color:var(--accent-cyan);"></i>
     </div>
-  </div>
-  <nav>
-    <div class="nav-item active" id="navMonitor" onclick="setView('monitor')"><i class="fa-solid fa-chart-line"></i><span class="nav-text">MONITOR GENERAL</span></div>
-    <div class="nav-item" id="navResolved" onclick="setView('resolved')"><i class="fa-solid fa-check-circle"></i><span class="nav-text">TICKETS RESUELTOS</span></div>
-    <div class="nav-item" onclick="processITReport()" style="color:var(--accent-cyan);"><i class="fa-solid fa-file-pdf"></i><span class="nav-text">INFORME DE AUDITORÍA</span></div>
-  </nav>
+    <div class="user-card" id="profileCard">
+        <div class="user-avatar" id="userAvatar">--</div>
+        <div class="user-info">
+            <span class="name" id="displayUser" style="font-weight:700; font-size:13px; display:block;">---</span>
+            <span class="rank" id="displayRank" style="font-size:8px; font-family:'Orbitron'; color:var(--text-secondary);">---</span>
+        </div>
+    </div>
+    <nav>
+        <div class="nav-item active" id="navMonitor" onclick="setView('monitor')"><i class="fa-solid fa-chart-line"></i><span class="nav-text">MONITOR GENERAL</span></div>
+        <div class="nav-item" id="navResolved" onclick="setView('resolved')"><i class="fa-solid fa-check-circle"></i><span class="nav-text">TICKETS RESUELTOS</span></div>
+        <div class="nav-item" onclick="alert('Generando Reporte...')" style="color:var(--accent-cyan);"><i class="fa-solid fa-file-pdf"></i><span class="nav-text">INFORME DE AUDITORÍA</span></div>
+    </nav>
 </aside>
 
 <main class="main-content" id="mainDashboard" style="display:none;">
-  <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-    <h1 id="viewTitle" style="font-family:'Orbitron'; font-size:22px; letter-spacing:5px;">MONITOR <span>GENERAL</span></h1>
-    <button onclick="syncData()" style="background:transparent; border:1px solid var(--accent-cyan); color:var(--accent-cyan); padding:8px 20px; cursor:pointer; font-family:'Orbitron'; font-size:10px; border-radius:4px;">RE-SYNC TELEMETRY</button>
-  </header>
-  
-  <div class="kpi-row" id="kpiContainer"></div>
+    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <h1 id="viewTitle" style="font-family:'Orbitron'; font-size:22px; letter-spacing:5px;">MONITOR <span>GENERAL</span></h1>
+        <button onclick="syncData()" style="background:transparent; border:1px solid var(--accent-cyan); color:var(--accent-cyan); padding:8px 20px; cursor:pointer; font-family:'Orbitron'; font-size:10px; border-radius:4px;">RE-SYNC TELEMETRY</button>
+    </header>
+    
+    <div class="kpi-row" id="kpiContainer"></div>
 
-  <div class="charts-grid" id="captureZone">
-    <div class="chart-box"><h4 id="labelChart1">RADAR DE INCIDENCIAS</h4><canvas id="chart1"></canvas></div>
-    <div class="chart-box"><h4>CARGA POR PRIORIDAD</h4><canvas id="chart2"></canvas></div>
-    <div class="chart-box"><h4 id="labelChart3">SALUD DE INFRAESTRUCTURA</h4><canvas id="chart3"></canvas></div>
-  </div>
+    <div class="charts-grid" id="captureZone">
+        <div class="chart-box"><h4 id="labelChart1">RADAR DE INCIDENCIAS</h4><canvas id="chart1"></canvas></div>
+        <div class="chart-box"><h4 id="labelChart2">CARGA POR PRIORIDAD</h4><canvas id="chart2"></canvas></div>
+        <div class="chart-box"><h4 id="labelChart3">SALUD DE INFRAESTRUCTURA</h4><canvas id="chart3"></canvas></div>
+    </div>
 
-  <div class="table-container"><table><thead id="tHead"></thead><tbody id="tBody"></tbody></table></div>
+    <div class="table-container"><table><thead id="tHead"></thead><tbody id="tBody"></tbody></table></div>
 </main>
 
 <div id="modalObs">
-  <div class="modal-content">
-    <h3 style="font-family:'Orbitron'; color:var(--accent-cyan); margin-bottom:15px; font-size:14px;">RESOLVER TICKET: <span id="modalTicketId"></span></h3>
-    <textarea id="textoObs" rows="5" placeholder="Logs de solución técnica..." style="width:100%; background:#050a14; border:1px solid var(--border-subtle); color:white; padding:20px; margin-bottom:25px; outline:none; font-family:'Share Tech Mono'; resize:none;"></textarea>
-    <div style="display:flex; gap:15px;"><button onclick="cerrarModal()" style="flex:1; background:none; border:1px solid gray; color:white; cursor:pointer;">ABORTAR</button><button onclick="enviarResolucion()" style="flex:2; background:var(--accent-green); border:none; font-family:'Orbitron'; font-weight:bold; cursor:pointer;">SUBMIT</button></div>
-  </div>
+    <div class="modal-content">
+        <h3 style="font-family:'Orbitron'; color:var(--accent-cyan); margin-bottom:15px; font-size:14px;">RESOLVER TICKET: <span id="modalTicketId"></span></h3>
+        <textarea id="textoObs" rows="5" placeholder="Logs de solución técnica..." style="width:100%; background:#050a14; border:1px solid var(--border-subtle); color:white; padding:20px; margin-bottom:25px; outline:none; font-family:'Share Tech Mono'; resize:none;"></textarea>
+        <div style="display:flex; gap:15px;">
+            <button onclick="cerrarModal()" style="flex:1; background:none; border:1px solid gray; color:white; cursor:pointer;">ABORTAR</button>
+            <button onclick="enviarResolucion()" style="flex:2; background:var(--accent-green); border:none; font-family:'Orbitron'; font-weight:bold; cursor:pointer;">SUBMIT</button>
+        </div>
+    </div>
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
-  const USERS = { 
-    "admin": { name: "YANANTH FAJARDO MOYA", rank: "ESPECIALISTA EN INFRAESTRUCTURA", pass: "Admin2026!", init: "YF", color: "#9d50bb" },
-    "ADMIN_CHRIS": { name: "CHRIS MORALES", rank: "NETWORK ENGINEER", pass: "CHRIS-IT2026!", init: "CM", color: "#007bff" }
-  };
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
+    const USERS = { 
+        "admin": { name: "YANANTH FAJARDO MOYA", rank: "ESPECIALISTA EN INFRAESTRUCTURA", pass: "Admin2026!", init: "YF", color: "#9d50bb" },
+        "ADMIN_CHRIS": { name: "CHRIS MORALES", rank: "NETWORK ENGINEER", pass: "CHRIS-IT2026!", init: "CM", color: "#007bff" }
+    };
 
-  let fullData = []; let charts = {}; let currentView = 'monitor'; let currentUser = null;
+    let fullData = []; let charts = {}; let currentView = 'monitor'; let currentUser = null; let ticketIdResolviendo = null;
 
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('collapsed');
-    document.body.classList.toggle('sidebar-is-collapsed');
-    setTimeout(() => { Object.values(charts).forEach(c => { if(c) c.resize(); }); }, 350);
-  }
-
-  function handleEnter(e) { if(e.key === 'Enter') attemptLogin(); }
-
-  function attemptLogin() {
-    const u = document.getElementById('lUser').value.trim();
-    const p = document.getElementById('lPass').value;
-    const found = USERS[u];
-    if(found && found.pass === p) {
-      currentUser = found;
-      document.getElementById('loginOverlay').style.display = 'none';
-      document.getElementById('sidebar').style.display = 'flex';
-      document.getElementById('mainDashboard').style.display = 'block';
-      document.getElementById('displayUser').textContent = currentUser.name;
-      document.getElementById('displayRank').textContent = currentUser.rank;
-      document.getElementById('userAvatar').textContent = currentUser.init;
-      document.getElementById('userAvatar').style.background = currentUser.color;
-      syncData();
-    } else { alert("ACCESO DENEGADO"); }
-  }
-
-  async function syncData() { try { const r = await fetch(SCRIPT_URL); fullData = await r.json(); updateUI(); } catch(e) { console.error("Error"); } }
-
-  function setView(v) { 
-    currentView = v; 
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    document.getElementById(v === 'monitor' ? 'navMonitor' : 'navResolved').classList.add('active');
-    updateUI(); 
-  }
-
-  function updateUI() {
-    const pend = fullData.filter(t => t.estado === 'Pendiente');
-    const res = fullData.filter(t => t.estado === 'Resuelto');
-    const box = document.getElementById('kpiContainer');
-    
-    if(currentView === 'monitor') {
-      document.getElementById('viewTitle').innerHTML = "MONITOR <span>GENERAL</span>";
-      document.getElementById('labelChart3').textContent = "SALUD DE INFRAESTRUCTURA";
-      box.innerHTML = `<div class="kpi-card"><span>ACTIVAS</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICAS</span><span class="kpi-val">${pend.filter(x=>x.prioridad==='Alta').length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-amber)"><span>PENDIENTES</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>SLA</span><span class="kpi-val">99.9%</span></div>`;
-      document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>EQUIPO</th><th>ACCIÓN</th></tr>`;
-      document.getElementById('tBody').innerHTML = pend.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" style="background:var(--accent-green); color:black; padding:5px 12px; border:none; border-radius:4px; font-family:'Orbitron'; font-size:9px; font-weight:bold; cursor:pointer;">RESOLVER</button></td></tr>`).join('');
-      renderCharts(pend);
-    } else {
-      document.getElementById('viewTitle').innerHTML = "TICKETS <span>RESUELTOS</span>";
-      document.getElementById('labelChart3').textContent = "IMPACTO DE TIEMPO";
-      box.innerHTML = `<div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>RESUELTOS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>EXITO</span><span class="kpi-val">98%</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-blue)"><span>T. MEDIO</span><span class="kpi-val">1.2h</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span>STATUS</span><span class="kpi-val">OK</span></div>`;
-      document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>TÉCNICO</th><th>SOLUCIÓN</th><th>FECHA</th><th>ESTADO</th></tr>`;
-      document.getElementById('tBody').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.colaborador}</td><td>${t.observaciones||'OK'}</td><td>${t['ticket resuelto']||'---'}</td><td style="color:var(--accent-green); font-weight:bold;">SUBMIT</td></tr>`).join('');
-      renderCharts(res);
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('collapsed');
+        document.body.classList.toggle('sidebar-is-collapsed');
+        setTimeout(() => { Object.values(charts).forEach(c => { if(c) c.resize(); }); }, 350);
     }
-  }
 
-  function renderCharts(data) {
-    const ctx1 = document.getElementById('chart1').getContext('2d');
-    const ctx2 = document.getElementById('chart2').getContext('2d');
-    const ctx3 = document.getElementById('chart3').getContext('2d');
-    if(charts.c1) charts.c1.destroy(); if(charts.c2) charts.c2.destroy(); if(charts.c3) charts.c3.destroy();
-    
-    const opts = { responsive: true, maintainAspectRatio: false, scales: { y: { display: true, ticks: { color: '#8b9bb4' } }, x: { display: true, ticks: { color: '#8b9bb4' } } }, plugins: { legend: { display: false } } };
+    function handleEnter(e) { if(e.key === 'Enter') attemptLogin(); }
 
-    // Gráfica 1: Radar (Imagen 7)
-    charts.c1 = new Chart(ctx1, { type: 'radar', data: { labels: ['Red','PC','Laptop','Tel','Per'], datasets: [{ data: [10,5,8,4,6], borderColor: '#00e5ff', backgroundColor: 'rgba(0,229,255,0.2)' }] }, options: { ...opts, scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } } } } });
-    
-    // Gráfica 2: Barras Fucsia y Azul (Imagen 7)
-    charts.c2 = new Chart(ctx2, { type: 'bar', data: { labels: ['Alta', 'Normal'], datasets: [{ data: [5, 12], backgroundColor: ['#ff3d6b', '#007bff'], borderRadius: 5 }] }, options: opts });
-    
-    // Gráfica 3: Polar Multicolor (Imagen 7) o Tiempo
-    if(currentView === 'monitor') {
-      charts.c3 = new Chart(ctx3, { type: 'polarArea', data: { labels: ['Net','Sec','HW','SW','Ops'], datasets: [{ data: [20, 15, 25, 10, 30], backgroundColor: ['#007bff','#00ffa3','#ffb300','#9d50bb','#ff3d6b'], borderWidth: 0 }] }, options: { ...opts, scales: { r: { ticks: { display: false } } } } });
-    } else {
-      charts.c3 = new Chart(ctx3, { type: 'line', data: { labels: ['T1','T2','T3','T4','T5'], datasets: [{ data: [1, 2, 0.5, 1.5, 1], borderColor: '#ffb300', tension: 0.4, fill: true, backgroundColor: 'rgba(255,179,0,0.1)' }] }, options: opts });
+    function attemptLogin() {
+        const u = document.getElementById('lUser').value.trim();
+        const p = document.getElementById('lPass').value;
+        const found = USERS[u];
+        if(found && found.pass === p) {
+            currentUser = found;
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('mainDashboard').style.display = 'block';
+            document.getElementById('displayUser').textContent = currentUser.name;
+            document.getElementById('displayRank').textContent = currentUser.rank;
+            document.getElementById('userAvatar').textContent = currentUser.init;
+            document.getElementById('userAvatar').style.background = currentUser.color;
+            syncData();
+        } else { alert("ACCESO DENEGADO"); }
     }
-  }
 
-  function abrirModal(id) { ticketIdResolviendo = id; document.getElementById('modalTicketId').textContent = id; document.getElementById('modalObs').style.display='flex'; }
-  function cerrarModal() { document.getElementById('modalObs').style.display='none'; }
-  async function enviarResolucion() {
-    const obs = document.getElementById('textoObs').value.trim();
-    if(!obs) return;
-    await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateStatus", id: ticketIdResolviendo, newStatus: "Resuelto", observations: obs }) });
-    cerrarModal(); setTimeout(syncData, 1500);
-  }
+    async function syncData() { 
+        try { 
+            const r = await fetch(SCRIPT_URL); 
+            fullData = await r.json(); 
+            updateUI(); 
+        } catch(e) { console.error("Error al sincronizar"); } 
+    }
+
+    function setView(v) { 
+        currentView = v; 
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(v === 'monitor' ? 'navMonitor' : 'navResolved').classList.add('active');
+        updateUI(); 
+    }
+
+    function updateUI() {
+        const pend = fullData.filter(t => t.estado === 'Pendiente');
+        const res = fullData.filter(t => t.estado === 'Resuelto');
+        const box = document.getElementById('kpiContainer');
+        
+        if(currentView === 'monitor') {
+            document.getElementById('viewTitle').innerHTML = "MONITOR <span>GENERAL</span>";
+            document.getElementById('labelChart2').textContent = "CARGA POR PRIORIDAD";
+            document.getElementById('labelChart3').textContent = "SALUD DE INFRAESTRUCTURA";
+            
+            box.innerHTML = `
+                <div class="kpi-card"><span>ACTIVAS</span><span class="kpi-val">${pend.length}</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICAS</span><span class="kpi-val">${pend.filter(x=>x.prioridad==='Alta').length}</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-amber)"><span>PENDIENTES</span><span class="kpi-val">${pend.length}</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>SLA</span><span class="kpi-val">99.9%</span></div>`;
+            
+            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>EQUIPO</th><th>ACCIÓN</th></tr>`;
+            document.getElementById('tBody').innerHTML = pend.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" style="background:var(--accent-green); color:black; padding:5px 12px; border:none; border-radius:4px; font-family:'Orbitron'; font-size:9px; font-weight:bold; cursor:pointer;">RESOLVER</button></td></tr>`).join('');
+            renderCharts(pend);
+        } else {
+            document.getElementById('viewTitle').innerHTML = "TICKETS <span>RESUELTOS</span>";
+            document.getElementById('labelChart2').textContent = "EFICIENCIA TÉCNICA (%)";
+            document.getElementById('labelChart3').textContent = "IMPACTO DE TIEMPO";
+            
+            box.innerHTML = `
+                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>RESUELTOS</span><span class="kpi-val">${res.length}</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>ÉXITO</span><span class="kpi-val">98%</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-blue)"><span>T. MEDIO</span><span class="kpi-val">1.2h</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span>STATUS</span><span class="kpi-val">OK</span></div>`;
+            
+            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>TÉCNICO</th><th>SOLUCIÓN</th><th>FECHA</th><th>ESTADO</th></tr>`;
+            document.getElementById('tBody').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.colaborador}</td><td>${t.observaciones||'OK'}</td><td>${t['ticket resuelto']||'---'}</td><td style="color:var(--accent-green); font-weight:bold;">SUBMIT</td></tr>`).join('');
+            renderCharts(res);
+        }
+    }
+
+    function renderCharts(data) {
+        const ctx1 = document.getElementById('chart1').getContext('2d');
+        const ctx2 = document.getElementById('chart2').getContext('2d');
+        const ctx3 = document.getElementById('chart3').getContext('2d');
+        
+        if(charts.c1) charts.c1.destroy(); 
+        if(charts.c2) charts.c2.destroy(); 
+        if(charts.c3) charts.c3.destroy();
+        
+        const opts = { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            scales: { 
+                y: { display: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b9bb4' } }, 
+                x: { display: true, grid: { display: false }, ticks: { color: '#8b9bb4' } } 
+            }, 
+            plugins: { legend: { display: false } } 
+        };
+
+        // Gráfica 1: Radar (Mismo para ambos o según contexto)
+        charts.c1 = new Chart(ctx1, { 
+            type: 'radar', 
+            data: { 
+                labels: ['Red','PC','Laptop','Tel','Per'], 
+                datasets: [{ 
+                    label: 'Incidencias',
+                    data: currentView === 'monitor' ? [12, 19, 3, 5, 2] : [5, 10, 15, 8, 12], 
+                    borderColor: '#00e5ff', 
+                    backgroundColor: 'rgba(0,229,255,0.2)' 
+                }] 
+            }, 
+            options: { ...opts, scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#8b9bb4' } } } } 
+        });
+        
+        // Gráfica 2: CAMBIO AQUÍ PARA NO REPETIR
+        if(currentView === 'monitor') {
+            charts.c2 = new Chart(ctx2, { 
+                type: 'bar', 
+                data: { 
+                    labels: ['Alta', 'Normal', 'Baja'], 
+                    datasets: [{ data: [8, 15, 5], backgroundColor: ['#ff3d6b', '#007bff', '#00ffa3'], borderRadius: 5 }] 
+                }, 
+                options: opts 
+            });
+        } else {
+            // En Resueltos mostramos Eficiencia por Técnico (Simulado)
+            charts.c2 = new Chart(ctx2, { 
+                type: 'doughnut', 
+                data: { 
+                    labels: ['SLA Cumplido', 'SLA Vencido'], 
+                    datasets: [{ data: [85, 15], backgroundColor: ['#00ffa3', '#ff3d6b'], borderWidth: 0 }] 
+                }, 
+                options: { ...opts, scales: { x: { display: false }, y: { display: false } } } 
+            });
+        }
+        
+        // Gráfica 3: Polar o Lineal
+        if(currentView === 'monitor') {
+            charts.c3 = new Chart(ctx3, { 
+                type: 'polarArea', 
+                data: { 
+                    labels: ['Net','Sec','HW','SW','Ops'], 
+                    datasets: [{ data: [20, 15, 25, 10, 30], backgroundColor: ['#007bff','#00ffa3','#ffb300','#9d50bb','#ff3d6b'], borderWidth: 0 }] 
+                }, 
+                options: { ...opts, scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } } } } 
+            });
+        } else {
+            charts.c3 = new Chart(ctx3, { 
+                type: 'line', 
+                data: { 
+                    labels: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie'], 
+                    datasets: [{ 
+                        data: [10, 25, 18, 30, 45], 
+                        borderColor: '#ffb300', 
+                        tension: 0.4, 
+                        fill: true, 
+                        backgroundColor: 'rgba(255,179,0,0.1)' 
+                    }] 
+                }, 
+                options: opts 
+            });
+        }
+    }
+
+    function abrirModal(id) { 
+        ticketIdResolviendo = id; 
+        document.getElementById('modalTicketId').textContent = id; 
+        document.getElementById('modalObs').style.display='flex'; 
+    }
+    
+    function cerrarModal() { document.getElementById('modalObs').style.display='none'; }
+    
+    async function enviarResolucion() {
+        const obs = document.getElementById('textoObs').value.trim();
+        if(!obs) return;
+        
+        // Mostrar feedback visual de carga
+        const btn = event.target;
+        btn.innerText = "ENVIANDO...";
+        
+        await fetch(SCRIPT_URL, { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify({ 
+                action: "updateStatus", 
+                id: ticketIdResolviendo, 
+                newStatus: "Resuelto", 
+                observations: obs 
+            }) 
+        });
+        
+        btn.innerText = "SUBMIT";
+        document.getElementById('textoObs').value = "";
+        cerrarModal(); 
+        setTimeout(syncData, 1500);
+    }
 </script>
 </body>
 </html>

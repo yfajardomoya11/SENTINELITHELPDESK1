@@ -3,202 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT HELP DESK | Soporte Técnico</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>TI HELP DESK | Soporte Técnico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
         :root {
             --bg: #020406; --card: #0a0e17; --blue: #007bff; --cyan: #00e5ff;
-            --green: #00ffa3; --red: #ff3d6b; --text: #f0f5ff;
+            --green: #00ffa3; --text: #f0f5ff;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            background-image: radial-gradient(circle at 50% 50%, #0a1428 0%, #020406 100%);
             padding: 20px;
         }
         .form-container {
             background: var(--card); border: 1px solid rgba(0, 123, 255, 0.2);
-            padding: 40px; border-radius: 15px; width: 100%; max-width: 700px;
-            box-shadow: 0 0 40px rgba(0, 123, 255, 0.15); border-top: 5px solid var(--blue);
+            padding: 40px; border-radius: 15px; width: 100%; max-width: 600px;
+            box-shadow: 0 0 30px rgba(0, 123, 255, 0.1); border-top: 4px solid var(--blue);
         }
-        h2 { font-family: 'Orbitron'; color: var(--cyan); text-align: center; letter-spacing: 3px; margin-bottom: 30px; text-transform: uppercase; }
+        .header-area { text-align: center; margin-bottom: 35px; }
+        .header-area h1 { font-family: 'Orbitron'; color: var(--cyan); letter-spacing: 3px; font-size: 26px; }
+        .header-area p { font-family: 'Orbitron'; font-size: 10px; color: #8b9bb4; letter-spacing: 2px; margin-top: 5px; }
 
-        .input-group { margin-bottom: 25px; }
-        label { display: block; margin-bottom: 10px; font-family: 'Orbitron'; font-size: 11px; color: var(--blue); letter-spacing: 1px; font-weight: bold; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-family: 'Orbitron'; font-size: 10px; color: var(--blue); letter-spacing: 1px; }
         
         select, input, textarea {
             width: 100%; background: #050a14; border: 1px solid rgba(0, 229, 255, 0.2);
-            padding: 14px; color: white; border-radius: 6px; outline: none; font-family: 'Rajdhani'; font-size: 16px; transition: 0.3s;
+            padding: 14px; color: white; border-radius: 6px; outline: none; font-family: 'Rajdhani'; font-size: 16px;
         }
-        select:focus, input:focus, textarea:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 229, 255, 0.1); }
-
-        /* Estilo para el Slider de Urgencia */
-        .range-container { display: flex; align-items: center; gap: 15px; }
-        input[type="range"] { flex: 1; accent-color: var(--cyan); cursor: pointer; }
-        .urgencia-val { font-family: 'Orbitron'; font-size: 12px; min-width: 80px; text-align: center; color: var(--cyan); }
-
-        .info-box {
-            background: rgba(0, 229, 255, 0.05); padding: 15px; border-radius: 6px;
-            font-size: 14px; margin-top: 10px; border-left: 4px solid var(--cyan); display: none;
-            line-height: 1.4;
-        }
+        select:focus, input:focus, textarea:focus { border-color: var(--cyan); }
 
         .btn-submit {
             width: 100%; background: var(--blue); color: white; border: none;
-            padding: 20px; border-radius: 6px; font-family: 'Orbitron'; font-weight: bold;
-            cursor: pointer; transition: 0.3s; letter-spacing: 3px; font-size: 14px; margin-top: 10px;
+            padding: 18px; border-radius: 6px; font-family: 'Orbitron'; font-weight: bold;
+            cursor: pointer; transition: 0.3s; letter-spacing: 2px; margin-top: 10px;
         }
-        .btn-submit:hover { background: var(--cyan); color: black; box-shadow: 0 0 25px var(--cyan); }
+        .btn-submit:hover { background: var(--cyan); color: black; box-shadow: 0 0 20px var(--cyan); }
+        
+        /* Pantalla de Recibido */
+        #successView { display: none; text-align: center; animation: fadeIn 0.4s ease; }
+        .check-icon { font-size: 70px; color: var(--blue); margin-bottom: 20px; }
+        .ticket-box { font-family: 'Orbitron'; font-size: 28px; color: var(--green); margin: 20px 0; display: block; }
 
-        /* Pantalla de Éxito */
-        #successCard {
-            display: none; text-align: center; animation: fadeIn 0.5s ease;
-        }
-        .check-icon { font-size: 60px; color: var(--cyan); margin-bottom: 20px; }
-        .ticket-number { font-family: 'Share Tech Mono'; font-size: 32px; color: var(--green); margin: 15px 0; display: block; border: 1px dashed var(--green); padding: 10px; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="form-container" id="formContainer">
-    <h2>IT HELP DESK SOPORTE TÉCNICO</h2>
-    
-    <form id="ticketForm">
+<div class="form-container" id="formView">
+    <div class="header-area">
+        <h1>TI HELP DESK</h1>
+        <p>SOPORTE TÉCNICO</p>
+    </div>
+
+    <form id="reportForm">
         <div class="input-group">
-            <label><i class="fa-solid fa-user-astronaut"></i> QUIÉN REALIZA EL REPORTE (USUARIO)</label>
-            <select id="colaborador" required>
-                <option value="">Seleccione su Avatar...</option>
-                <option value="Vegeta">Vegeta (Orgullo Saiyajin)</option>
-                <option value="Van Flyheight">Van Flyheight (Piloto Zoids)</option>
-                <option value="Tony Stark">Tony Stark (Iron Man)</option>
-                <option value="Neo">Neo (The Matrix)</option>
-                <option value="Goku">Goku (Guerrero Z)</option>
+            <label>NOMBRE DEL COLABORADOR</label>
+            <select id="nombre" required>
+                <option value="">Seleccione su nombre...</option>
+                <option value="Vegeta">Vegeta</option>
+                <option value="Van Flyheight">Van Flyheight</option>
+                <option value="Tony Stark">Tony Stark</option>
+                <option value="Neo">Neo</option>
+                <option value="Chris Morales">Chris Morales</option>
             </select>
         </div>
 
         <div class="input-group">
-            <label><i class="fa-solid fa-microchip"></i> DISPOSITIVO Y FALLA DETECTADA</label>
-            <select id="dispositivoFalla" required>
-                <option value="">Seleccione el problema...</option>
-                <optgroup label="Infraestructura Core">
-                    <option value="Router: Pérdida de paquetes">Router: Pérdida de paquetes / Caída de Enlace</option>
-                    <option value="Switch: Error de puerto">Switch: Puerto Down / Error de VLAN</option>
-                    <option value="Firewall: Bloqueo de acceso">Firewall: Regla bloqueando servicio crítico</option>
-                </optgroup>
-                <optgroup label="Estaciones de Trabajo">
-                    <option value="PC: Pantallazo Azul">PC: Pantallazo Azul (BSOD) / No enciende</option>
-                    <option value="Laptop: Wi-Fi Inestable">Laptop: Desconexión constante de Wi-Fi</option>
-                </optgroup>
-                <optgroup label="Periféricos & Red">
-                    <option value="Impresora: Error de Cola">Impresora: Atasco de papel / Error de red</option>
-                    <option value="Access Point: No transmite">Access Point: Sin señal SSID / SSID invisible</option>
-                </optgroup>
+            <label>TIPO DE DISPOSITIVO</label>
+            <select id="dispositivo" onchange="cargarFallas()" required>
+                <option value="">Seleccione Dispositivo...</option>
+                <option value="Computadora">Computadora (PC / Laptop)</option>
+                <option value="Red">Equipo de Red (Router / Switch)</option>
+                <option value="Impresora">Impresora / Periférico</option>
+                <option value="Telefono">Teléfono IP / Móvil</option>
             </select>
         </div>
 
         <div class="input-group">
-            <label><i class="fa-solid fa-screwdriver-wrench"></i> GESTIÓN DE MANTENIMIENTO</label>
-            <select id="tipoGestion" onchange="explicarGestion()" required>
-                <option value="">Seleccione Tipo...</option>
-                <option value="Preventivo">MANTENIMIENTO PREVENTIVO</option>
-                <option value="Correctivo">MANTENIMIENTO CORRECTIVO</option>
+            <label>FALLA DETECTADA</label>
+            <select id="falla" required disabled>
+                <option value="">Primero seleccione un dispositivo...</option>
             </select>
-            <div id="explicacionGestion" class="info-box"></div>
         </div>
 
         <div class="input-group">
-            <label><i class="fa-solid fa-bolt"></i> NIVEL DE URGENCIA</label>
-            <div class="range-container">
-                <input type="range" id="urgenciaRange" min="1" max="3" step="1" value="2" oninput="actualizarUrgencia()">
-                <div class="urgencia-val" id="urgenciaTxt">PRIORIDAD: MEDIA</div>
-            </div>
+            <label>GESTIÓN SOLICITADA</label>
+            <select id="gestion" required>
+                <option value="Correctivo">Mantenimiento Correctivo (Reparación)</option>
+                <option value="Preventivo">Mantenimiento Preventivo (Revisión)</option>
+            </select>
         </div>
 
         <div class="input-group">
-            <label><i class="fa-solid fa-comment-dots"></i> OBSERVACIONES ADICIONALES (OPCIONAL)</label>
-            <textarea id="observaciones" rows="3" placeholder="Detalles extra para el técnico..."></textarea>
+            <label>OBSERVACIONES (OPCIONAL)</label>
+            <textarea id="obs" rows="3" placeholder="Detalles adicionales..."></textarea>
         </div>
 
-        <button type="submit" class="btn-submit" id="btnEnviar">ENVIAR REPORTE</button>
+        <button type="submit" class="btn-submit" id="submitBtn">ENVIAR REPORTE</button>
     </form>
 </div>
 
-<div class="form-container" id="successCard">
+<div class="form-container" id="successView">
     <i class="fa-solid fa-circle-check check-icon"></i>
-    <h2 style="color:var(--text)">¡RECIBIDO CON ÉXITO!</h2>
-    <p style="color:#8b9bb4; font-size:14px; margin-bottom:20px;">Tu solicitud ha sido ingresada al sistema Sentinel.</p>
-    <p style="font-family:'Orbitron'; font-size:10px; color:var(--blue);">ESTE ES TU NÚMERO DE TICKET:</p>
-    <span class="ticket-number" id="numTicket">#---</span>
-    <p style="color:var(--cyan); font-weight:bold; margin-top:20px;">PRONTO SERÁS ATENDIDO POR TI.</p>
-    <button onclick="location.reload()" class="btn-submit" style="background:#1a2a3a; margin-top:30px;">CREAR OTRO REPORTE</button>
+    <h2 style="font-family: 'Orbitron'; color: white;">¡RECIBIDO!</h2>
+    <p style="margin-top: 15px; color: #8b9bb4;">Muchas gracias, <span id="userName" style="color: var(--cyan);"></span>.</p>
+    <p style="margin-top: 10px; font-size: 12px;">TU NÚMERO DE TICKET ES:</p>
+    <span class="ticket-box" id="ticketNum">#0000</span>
+    <p style="color: var(--cyan); font-weight: bold; margin-top: 20px; letter-spacing: 1px;">PRONTO SERÁ CONTACTADO POR TI.</p>
+    <button onclick="location.reload()" class="btn-submit" style="background: #1a2433; margin-top: 30px;">ACEPTAR</button>
 </div>
 
 <script>
-    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
+    const APP_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
 
-    function explicarGestion() {
-        const val = document.getElementById('tipoGestion').value;
-        const box = document.getElementById('explicacionGestion');
-        if (val === 'Preventivo') {
-            box.style.display = 'block';
-            box.style.borderColor = 'var(--green)';
-            box.innerHTML = "<strong>MANTENIMIENTO PREVENTIVO:</strong> Tarea para evitar fallos a futuro. Incluye limpieza, actualizaciones y revisiones de rutina. <i>'Más vale prevenir que formatear'.</i>";
-        } else if (val === 'Correctivo') {
-            box.style.display = 'block';
-            box.style.borderColor = 'var(--red)';
-            box.innerHTML = "<strong>MANTENIMIENTO CORRECTIVO:</strong> El equipo ya presenta una falla real que impide el trabajo. Requiere intervención técnica inmediata para reparar.";
+    const fallasPorDispositivo = {
+        "Computadora": ["No enciende", "Pantallazo Azul", "Lenta / Se pega", "Error de Software"],
+        "Red": ["Sin Internet", "Wi-Fi no conecta", "Cable dañado", "VPN no funciona"],
+        "Impresora": ["Atasco de papel", "No imprime", "Sin tinta / tóner", "Error de red"],
+        "Telefono": ["Sin tono", "Pantalla quebrada", "No carga", "App no abre"]
+    };
+
+    function cargarFallas() {
+        const disp = document.getElementById('dispositivo').value;
+        const fallaSelect = document.getElementById('falla');
+        fallaSelect.innerHTML = '<option value="">Seleccione la falla...</option>';
+        
+        if (disp) {
+            fallaSelect.disabled = false;
+            fallasPorDispositivo[disp].forEach(f => {
+                let opt = document.createElement('option');
+                opt.value = f;
+                opt.innerText = f;
+                fallaSelect.appendChild(opt);
+            });
         } else {
-            box.style.display = 'none';
+            fallaSelect.disabled = true;
         }
     }
 
-    function actualizarUrgencia() {
-        const val = document.getElementById('urgenciaRange').value;
-        const txt = document.getElementById('urgenciaTxt');
-        if (val == "1") { txt.innerText = "PRIORIDAD: BAJA"; txt.style.color = "var(--green)"; }
-        else if (val == "2") { txt.innerText = "PRIORIDAD: MEDIA"; txt.style.color = "var(--cyan)"; }
-        else { txt.innerText = "PRIORIDAD: ALTA"; txt.style.color = "var(--red)"; }
-    }
-
-    document.getElementById('ticketForm').addEventListener('submit', async (e) => {
+    document.getElementById('reportForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const btn = document.getElementById('btnEnviar');
-        btn.disabled = true;
-        btn.innerText = "TRANSMITIENDO A SENTINEL...";
+        const btn = document.getElementById('submitBtn');
+        const nombre = document.getElementById('nombre').value;
+        const tNum = Math.floor(1000 + Math.random() * 9000);
 
-        // Generamos un ID de ticket aleatorio para el mensaje
-        const ticketID = Math.floor(1000 + Math.random() * 9000);
-        
+        btn.disabled = true;
+        btn.innerText = "ENVIANDO...";
+
         const payload = {
             action: "addTicket",
-            colaborador: document.getElementById('colaborador').value,
-            dispositivo: document.getElementById('dispositivoFalla').value,
-            tipo: document.getElementById('tipoGestion').value,
-            prioridad: document.getElementById('urgenciaTxt').innerText.split(': ')[1],
-            observaciones: document.getElementById('observaciones').value
+            colaborador: nombre,
+            dispositivo: document.getElementById('dispositivo').value,
+            falla: document.getElementById('falla').value,
+            tipo: document.getElementById('gestion').value,
+            observaciones: document.getElementById('obs').value
         };
 
         try {
-            await fetch(GOOGLE_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(payload)
-            });
-
-            // Ocultamos formulario, mostramos éxito
-            document.getElementById('formContainer').style.display = 'none';
-            document.getElementById('successCard').style.display = 'block';
-            document.getElementById('numTicket').innerText = "#" + ticketID;
-
-        } catch (error) {
-            alert("Error de conexión. Intente de nuevo.");
+            await fetch(APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            
+            document.getElementById('formView').style.display = 'none';
+            document.getElementById('successView').style.display = 'block';
+            document.getElementById('userName').innerText = nombre;
+            document.getElementById('ticketNum').innerText = "#" + tNum;
+        } catch (err) {
+            alert("Error al enviar. Intente de nuevo.");
             btn.disabled = false;
-            btn.innerText = "REENVIAR REPORTE";
+            btn.innerText = "REINTENTAR";
         }
     });
 </script>

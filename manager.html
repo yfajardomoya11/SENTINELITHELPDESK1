@@ -21,7 +21,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; display: flex; min-height: 100vh; overflow: hidden; }
 
-        /* LOGIN */
+        /* LOGIN OVERLAY */
         #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 50px; border-radius: 12px; width: 400px; text-align: center; border-top: 4px solid var(--accent-blue); box-shadow: 0 0 30px rgba(0, 123, 255, 0.2); }
         .login-field { width: 100%; background: #050a14; border: 1px solid var(--border-glow); padding: 15px; color: white; margin-bottom: 20px; outline: none; font-family: 'Share Tech Mono'; border-radius: 4px; }
@@ -37,7 +37,7 @@
         .dashboard-view { display: none; }
         .dashboard-view.active { display: block; animation: fadeIn 0.4s ease; }
 
-        /* KPI & CHARTS */
+        /* KPI ROW */
         .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .kpi-card { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 25px; border-radius: 8px; border-bottom: 4px solid var(--accent-blue); }
         .kpi-val { font-family: 'Orbitron'; font-size: 2.2rem; font-weight: 900; display: block; margin-top: 10px; }
@@ -46,7 +46,6 @@
         .chart-box { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 25px; border-radius: 12px; height: 380px; }
         .chart-box h4 { font-family: 'Orbitron'; font-size: 10px; color: var(--accent-cyan); margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* TABLES */
         .table-container { background: var(--bg-card); border: 1px solid var(--border-glow); border-radius: 12px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
         th { padding: 18px; text-align: left; background: rgba(0, 123, 255, 0.05); color: var(--accent-blue); font-family: 'Orbitron'; font-size: 10px; }
@@ -88,7 +87,7 @@
 
 <main class="main-content" id="mainDashboard">
     <div class="time-filter">
-        <label style="font-family:'Orbitron'; font-size:11px; color:var(--text-secondary);">PERIODO DE EXTRACCIÓN:</label>
+        <label style="font-family:'Orbitron'; font-size:11px; color:var(--text-secondary);">RANGO AUDITADO:</label>
         <select id="timeRange" class="time-select" onchange="updateUI()">
             <option value="8760">HISTÓRICO TOTAL</option>
             <option value="720">ÚLTIMOS 30 DÍAS</option>
@@ -107,7 +106,7 @@
                 <div class="kpi-card"><span>ACTIVAS</span><span class="kpi-val" id="k-pend" style="color:var(--accent-cyan)">0</span></div>
                 <div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICOS</span><span class="kpi-val" id="k-crit" style="color:var(--accent-red)">0</span></div>
                 <div class="kpi-card"><span>BACKLOG</span><span class="kpi-val" id="k-total">0</span></div>
-                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>HEALTH</span><span class="kpi-val" id="k-health" style="color:var(--accent-green)">94%</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>NETWORK HEALTH</span><span class="kpi-val" id="k-health" style="color:var(--accent-green)">94%</span></div>
             </div>
             <div class="charts-grid">
                 <div class="chart-box"><h4>SALUD POR SECTORES DE RED</h4><canvas id="chartM1"></canvas></div>
@@ -138,7 +137,7 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
     
-    // BASE DE DATOS DE USUARIOS (NUEVO USUARIO CRIS AGREGADO)
+    // DB DE USUARIOS (ACTUALIZADA)
     const USERS = { 
         "admin": { name: "YANANTH FAJARDO MOYA", pass: "Admin2026!", role: "ESPECIALISTA INFRAESTRUCTURA" },
         "chris": { name: "CHRIS MORALES", pass: "Admin123!", role: "CONTROLADOR DE SERVICIOS IT" }
@@ -234,28 +233,15 @@
         try {
             const canvas = await html2canvas(printArea, { backgroundColor: '#020406', scale: 2 });
             const imgData = canvas.toDataURL('image/png');
-            
-            // ESTÉTICA DE AUDITORÍA PROFESIONAL
             doc.setFillColor(2, 4, 6); doc.rect(0, 0, 210, 297, 'F');
             doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255);
             doc.setFontSize(22); doc.text("AUDITORÍA ESTRATÉGICA TI", 15, 25);
-            
             doc.setFontSize(10); doc.setTextColor(139, 155, 180);
             doc.text("RESPONSABLE: " + document.getElementById('displayUser').innerText, 15, 35);
-            doc.text("RANGO AUDITADO: " + document.getElementById('timeRange').options[document.getElementById('timeRange').selectedIndex].text, 15, 40);
-            doc.text("FECHA DE EMISIÓN: " + new Date().toLocaleString(), 15, 45);
-            
+            doc.text("RANGO: " + document.getElementById('timeRange').options[document.getElementById('timeRange').selectedIndex].text, 15, 40);
             doc.setDrawColor(0, 123, 255); doc.line(15, 50, 195, 50);
             doc.addImage(imgData, 'PNG', 10, 60, 190, 100);
-            
-            doc.setFontSize(12); doc.setTextColor(0, 255, 163);
-            doc.text("CONCLUSIONES DE INFRAESTRUCTURA:", 15, 175);
-            doc.setFontSize(10); doc.setTextColor(240, 245, 255);
-            doc.text("- Estabilidad de red mantenida bajo parámetros óptimos.", 15, 185);
-            doc.text("- Eficiencia operativa en resolución de tickets crítica confirmada.", 15, 192);
-            doc.text("- No se detectan cuellos de botella en sectores de red auditados.", 15, 199);
-            
-            doc.save(`AUDITORIA_IT_${new Date().getTime()}.pdf`);
+            doc.save(`AUDITORIA_SENTINEL_${new Date().getTime()}.pdf`);
         } catch (e) { alert("Error PDF"); } finally { btn.innerHTML = '<i class="fa-solid fa-file-invoice"></i> GENERAR AUDITORÍA'; }
     }
 

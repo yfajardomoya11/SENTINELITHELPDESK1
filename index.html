@@ -49,7 +49,7 @@
         }
         .btn-submit:hover { background: var(--cyan); color: black; box-shadow: 0 0 20px var(--cyan); }
         
-        /* Pantalla de éxito */
+        /* Vista de Recibido */
         #successView { display: none; text-align: center; animation: fadeIn 0.4s ease; }
         .check-icon { font-size: 80px; color: var(--blue); margin-bottom: 20px; text-shadow: 0 0 20px var(--blue); }
         .ticket-box { font-family: 'Orbitron'; font-size: 32px; color: var(--green); margin: 20px 0; display: block; }
@@ -79,7 +79,7 @@
         </div>
 
         <div class="input-group">
-            <label>GESTIÓN SOLICITADA</label>
+            <label>TIPO DE GESTIÓN</label>
             <select id="gestion" onchange="explicarGestion()" required>
                 <option value="">Seleccione tipo de mantenimiento...</option>
                 <option value="Preventivo">Mantenimiento Preventivo</option>
@@ -89,7 +89,7 @@
         </div>
 
         <div class="input-group">
-            <label>DISPOSITIVO AFECTADO</label>
+            <label>DISPOSITIVO</label>
             <select id="dispositivo" onchange="cargarFallas()" required>
                 <option value="">Seleccione equipo...</option>
                 <option value="Computadora">Computadora (PC / Laptop)</option>
@@ -108,7 +108,7 @@
 
         <div class="input-group">
             <label>OBSERVACIONES (OPCIONAL)</label>
-            <textarea id="obs" rows="3" placeholder="Detalles extra para el equipo técnico..."></textarea>
+            <textarea id="obs" rows="3" placeholder="Detalles extra para el equipo de soporte..."></textarea>
         </div>
 
         <button type="submit" class="btn-submit" id="submitBtn">ENVIAR REPORTE</button>
@@ -126,6 +126,7 @@
 </div>
 
 <script>
+    // URL DE TU IMPLEMENTACIÓN DE GOOGLE
     const APP_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
 
     const fallasMaster = {
@@ -141,10 +142,10 @@
         box.style.display = g ? 'block' : 'none';
         if(g === 'Preventivo') {
             box.style.borderColor = 'var(--green)';
-            box.innerHTML = "<b style='color:var(--green)'>MANTENIMIENTO PREVENTIVO:</b> Tareas diseñadas para evitar fallos (limpieza, parches, revisiones). Buscamos que el equipo no falle a futuro.";
+            box.innerHTML = "<b style='color:var(--green)'>PREVENTIVO:</b> Tareas programadas para evitar fallas a futuro. Mantiene la salud de la red alta.";
         } else if(g === 'Correctivo') {
             box.style.borderColor = 'var(--red)';
-            box.innerHTML = "<b style='color:var(--red)'>MANTENIMIENTO CORRECTIVO:</b> Reparación de una falla activa que impide el uso normal del equipo. Requiere atención inmediata.";
+            box.innerHTML = "<b style='color:var(--red)'>CORRECTIVO:</b> Reparación de una falla activa que detiene o afecta el trabajo actual.";
         }
     }
 
@@ -168,7 +169,7 @@
         const user = document.getElementById('nombre').value;
         const tNum = Math.floor(1000 + Math.random() * 9000);
 
-        btn.disabled = true; btn.innerText = "SINCRONIZANDO CON TI...";
+        btn.disabled = true; btn.innerText = "ENVIANDO REPORTE...";
 
         const payload = {
             action: "addTicket",
@@ -180,14 +181,21 @@
         };
 
         try {
-            await fetch(APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            // El modo no-cors permite enviar datos aunque no podamos leer la respuesta
+            await fetch(APP_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify(payload) 
+            });
+
             document.getElementById('formView').style.display = 'none';
             document.getElementById('successView').style.display = 'block';
             document.getElementById('userName').innerText = user;
             document.getElementById('ticketNum').innerText = "#" + tNum;
+
         } catch (err) {
-            alert("Error de enlace. Por favor, intente de nuevo.");
-            btn.disabled = false; btn.innerText = "REENVIAR REPORTE";
+            alert("Error al conectar con la base de datos.");
+            btn.disabled = false; btn.innerText = "REINTENTAR ENVÍO";
         }
     });
 </script>

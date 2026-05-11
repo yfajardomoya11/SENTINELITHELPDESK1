@@ -101,7 +101,7 @@
         </div>
         <div class="table-wrap">
             <table>
-                <thead><tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>EQUIPO</th><th>ACCIÓN</th></tr></thead>
+                <thead><tr><th>ID</th><th>PRIORIDAD</th><th>COLABORADOR</th><th>EQUIPO</th><th>ACCIÓN</th></tr></thead>
                 <tbody id="body-monitor"></tbody>
             </table>
         </div>
@@ -121,7 +121,7 @@
         </div>
         <div class="table-wrap">
             <table>
-                <thead><tr><th>ID</th><th>CIERRE</th><th>TÉCNICO</th><th>OBSERVACIÓN TÉCNICA</th></tr></thead>
+                <thead><tr><th>ID</th><th>FECHA CIERRE</th><th>COLABORADOR</th><th>OBSERVACIÓN</th></tr></thead>
                 <tbody id="body-historico"></tbody>
             </table>
         </div>
@@ -134,19 +134,19 @@
         <textarea id="mObs" placeholder="Describa la solución técnica para archivar..."></textarea>
         <div style="display:flex; gap:10px;">
             <button onclick="closeModal()" style="flex:1; background:#333; border:none; color:white; cursor:pointer; font-family:'Orbitron'; font-size:9px;">ATRÁS</button>
-            <button onclick="submitClose()" style="flex:2; background:var(--green); color:black;" class="btn-finish">CONFIRMAR Y CERRAR</button>
+            <button id="confirmBtn" onclick="submitClose()" style="flex:2; background:var(--green); color:black;" class="btn-finish">CONFIRMAR Y CERRAR</button>
         </div>
     </div>
 </div>
 
 <script>
-    // URL ACTUALIZADA SEGÚN TU IMPLEMENTACIÓN
     const URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
     
     const USERS = {
         "admin": { n: "YANANTH FAJARDO MOYA", p: "Admin2026!", r: "ESPECIALISTA INFRAESTRUCTURA" },
         "chris": { n: "CHRIS MORALES", p: "Admin123!", r: "CONTROLADOR SOPORTE IT" }
     };
+
     let fullData = []; let charts = {}; let tid = null;
 
     function login() {
@@ -175,13 +175,17 @@
         try {
             const res = await fetch(URL);
             const json = await res.json();
+            // Normalización de datos para evitar errores de nombres de columna
             fullData = json.map(r => {
-                let o = {};
-                for(let k in r) o[k.toLowerCase().trim()] = r[k];
-                return o;
+                let clean = {};
+                for(let k in r) {
+                    let key = k.toLowerCase().trim().replace(/\s+/g, '');
+                    clean[key] = r[k];
+                }
+                return clean;
             });
             render();
-        } catch(e) { console.error("Error sincronizando:", e); }
+        } catch(e) { console.error("Error Sync:", e); }
     }
 
     function render() {
@@ -191,18 +195,34 @@
         let pc=0, rc=0, cc=0;
 
         fullData.forEach(t => {
-            const est = (t.estado || "").toLowerCase();
+            const est = (t.estado || "").toLowerCase().trim();
             const id = t.id || "---";
-            if(est === 'pendiente') {
-                pc++; if((t.prioridad||"").toLowerCase()==='alta') cc++;
-                mBody.innerHTML += `<tr><td style="color:var(--cyan); font-weight:bold;">#${id}</td><td>${t.prioridad||'Normal'}</td><td>${t.colaborador||t.técnico||'Chris'}</td><td>${t.equipo||t.dispositivo||'N/A'}</td><td><button class="btn-finish" onclick="openModal('${id}')">FINALIZAR TICKET</button></td></tr>`;
+
+            if(est === 'pendiente' || est === '') {
+                pc++; 
+                if((t.prioridad||"").toLowerCase() === 'alta') cc++;
+                mBody.innerHTML += `<tr>
+                    <td style="color:var(--cyan); font-weight:bold;">#${id}</td>
+                    <td>${t.prioridad || 'Media'}</td>
+                    <td>${t.colaborador || 'Usuario'}</td>
+                    <td>${t.dispositivo || t.equipo || 'N/A'}</td>
+                    <td><button class="btn-finish" onclick="openModal('${id}')">FINALIZAR TICKET</button></td>
+                </tr>`;
             } else if(est === 'resuelto') {
                 rc++;
-                hBody.innerHTML += `<tr><td style="color:var(--green); font-weight:bold;">#${id}</td><td>${t['ticket resuelto']||'---'}</td><td>${t.colaborador||t.técnico||'Chris'}</td><td style="font-family:'Share Tech Mono'; color:var(--cyan); font-size:12px;">${t.observaciones||'OK'}</td></tr>`;
+                hBody.innerHTML += `<tr>
+                    <td style="color:var(--green); font-weight:bold;">#${id}</td>
+                    <td>${t.fechacierre || t.ticketresuelto || '---'}</td>
+                    <td>${t.colaborador || 'Sistema'}</td>
+                    <td style="font-family:'Share Tech Mono'; color:var(--cyan); font-size:12px;">${t.observaciones || 'Sin notas'}</td>
+                </tr>`;
             }
         });
-        document.getElementById('kp-pend').innerText=pc; document.getElementById('kr-res').innerText=rc;
-        document.getElementById('kp-crit').innerText=cc; document.getElementById('kp-total').innerText=fullData.length;
+
+        document.getElementById('kp-pend').innerText=pc; 
+        document.getElementById('kr-res').innerText=rc;
+        document.getElementById('kp-crit').innerText=cc; 
+        document.getElementById('kp-total').innerText=fullData.length;
         renderMonCharts();
     }
 
@@ -226,18 +246,34 @@
     function closeModal() { document.getElementById('modal').style.display='none'; document.getElementById('mObs').value=''; }
 
     async function submitClose() {
-        const obs = document.getElementById('mObs').value; if(!obs) return alert('Describa la solución.');
-        const btn = document.querySelector("#modal .btn-finish"); btn.disabled=true; btn.innerText="ARCHIVANDO...";
-        await fetch(URL, { 
-            method:'POST', 
-            mode:'no-cors', 
-            body:JSON.stringify({action:'updateStatus', id:tid, observations:obs}) 
-        });
-        closeModal(); btn.disabled=false; btn.innerText="CONFIRMAR Y CERRAR"; setTimeout(sync, 1500);
+        const obs = document.getElementById('mObs').value; 
+        if(!obs) return alert('Describa la solución técnica.');
+        
+        const btn = document.getElementById('confirmBtn'); 
+        btn.disabled=true; btn.innerText="PROCESANDO...";
+
+        try {
+            await fetch(URL, { 
+                method:'POST', 
+                mode:'no-cors', 
+                body:JSON.stringify({action:'updateStatus', id:tid, observations:obs}) 
+            });
+            
+            closeModal();
+            btn.disabled=false; 
+            btn.innerText="CONFIRMAR Y CERRAR";
+            
+            // Espera un momento para que Google Script termine de escribir antes de re-sincronizar
+            setTimeout(sync, 2000);
+        } catch (e) {
+            alert("Error al cerrar ticket.");
+            btn.disabled=false;
+        }
     }
 
     async function reporte() {
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
+        const { jsPDF } = window.jspdf; 
+        const doc = new jsPDF();
         doc.setFillColor(2, 4, 6); doc.rect(0, 0, 210, 297, 'F');
         doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255); doc.setFontSize(22); doc.text("AUDITORÍA INFRAESTRUCTURA TI", 15, 25);
         doc.setFontSize(10); doc.setTextColor(139, 155, 180); doc.text("RESPONSABLE: " + document.getElementById('uDisplay').innerText, 15, 35);

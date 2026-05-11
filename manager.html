@@ -140,7 +140,9 @@
 </div>
 
 <script>
+    // URL ACTUALIZADA SEGÚN TU IMPLEMENTACIÓN
     const URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
+    
     const USERS = {
         "admin": { n: "YANANTH FAJARDO MOYA", p: "Admin2026!", r: "ESPECIALISTA INFRAESTRUCTURA" },
         "chris": { n: "CHRIS MORALES", p: "Admin123!", r: "CONTROLADOR SOPORTE IT" }
@@ -179,7 +181,7 @@
                 return o;
             });
             render();
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Error sincronizando:", e); }
     }
 
     function render() {
@@ -226,7 +228,11 @@
     async function submitClose() {
         const obs = document.getElementById('mObs').value; if(!obs) return alert('Describa la solución.');
         const btn = document.querySelector("#modal .btn-finish"); btn.disabled=true; btn.innerText="ARCHIVANDO...";
-        await fetch(URL, { method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStatus', id:tid, observations:obs}) });
+        await fetch(URL, { 
+            method:'POST', 
+            mode:'no-cors', 
+            body:JSON.stringify({action:'updateStatus', id:tid, observations:obs}) 
+        });
         closeModal(); btn.disabled=false; btn.innerText="CONFIRMAR Y CERRAR"; setTimeout(sync, 1500);
     }
 

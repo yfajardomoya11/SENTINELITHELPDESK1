@@ -10,7 +10,7 @@
     <style>
         :root {
             --bg: #020406; --card: #0a0e17; --blue: #007bff; --cyan: #00e5ff;
-            --green: #00ffa3; --text: #f0f5ff;
+            --green: #00ffa3; --red: #ff3d6b; --text: #f0f5ff;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -20,10 +20,10 @@
         }
         .form-container {
             background: var(--card); border: 1px solid rgba(0, 123, 255, 0.2);
-            padding: 40px; border-radius: 15px; width: 100%; max-width: 600px;
+            padding: 40px; border-radius: 15px; width: 100%; max-width: 650px;
             box-shadow: 0 0 30px rgba(0, 123, 255, 0.1); border-top: 4px solid var(--blue);
         }
-        .header-area { text-align: center; margin-bottom: 35px; }
+        .header-area { text-align: center; margin-bottom: 30px; }
         .header-area h1 { font-family: 'Orbitron'; color: var(--cyan); letter-spacing: 3px; font-size: 26px; }
         .header-area p { font-family: 'Orbitron'; font-size: 10px; color: #8b9bb4; letter-spacing: 2px; margin-top: 5px; }
 
@@ -32,9 +32,16 @@
         
         select, input, textarea {
             width: 100%; background: #050a14; border: 1px solid rgba(0, 229, 255, 0.2);
-            padding: 14px; color: white; border-radius: 6px; outline: none; font-family: 'Rajdhani'; font-size: 16px;
+            padding: 14px; color: white; border-radius: 6px; outline: none; font-family: 'Rajdhani'; font-size: 16px; transition: 0.3s;
         }
         select:focus, input:focus, textarea:focus { border-color: var(--cyan); }
+
+        /* Cuadro de explicación dinámica */
+        .info-box {
+            background: rgba(0, 229, 255, 0.05); padding: 15px; border-radius: 6px;
+            font-size: 13px; margin-top: 10px; border-left: 4px solid var(--cyan); display: none;
+            line-height: 1.4; color: #8b9bb4;
+        }
 
         .btn-submit {
             width: 100%; background: var(--blue); color: white; border: none;
@@ -43,10 +50,9 @@
         }
         .btn-submit:hover { background: var(--cyan); color: black; box-shadow: 0 0 20px var(--cyan); }
         
-        /* Pantalla de Recibido */
         #successView { display: none; text-align: center; animation: fadeIn 0.4s ease; }
         .check-icon { font-size: 70px; color: var(--blue); margin-bottom: 20px; }
-        .ticket-box { font-family: 'Orbitron'; font-size: 28px; color: var(--green); margin: 20px 0; display: block; }
+        .ticket-box { font-family: 'Orbitron'; font-size: 32px; color: var(--green); margin: 20px 0; display: block; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -61,46 +67,47 @@
 
     <form id="reportForm">
         <div class="input-group">
-            <label>NOMBRE DEL COLABORADOR</label>
+            <label>COLABORADOR</label>
             <select id="nombre" required>
-                <option value="">Seleccione su nombre...</option>
+                <option value="">Seleccione su identidad...</option>
                 <option value="Vegeta">Vegeta</option>
                 <option value="Van Flyheight">Van Flyheight</option>
-                <option value="Tony Stark">Tony Stark</option>
-                <option value="Neo">Neo</option>
                 <option value="Chris Morales">Chris Morales</option>
+                <option value="Tony Stark">Tony Stark</option>
             </select>
         </div>
 
         <div class="input-group">
-            <label>TIPO DE DISPOSITIVO</label>
+            <label>TIPO DE GESTIÓN</label>
+            <select id="gestion" onchange="explicarGestion()" required>
+                <option value="">Seleccione gestión...</option>
+                <option value="Preventivo">Mantenimiento Preventivo</option>
+                <option value="Correctivo">Mantenimiento Correctivo</option>
+            </select>
+            <div id="infoGestion" class="info-box"></div>
+        </div>
+
+        <div class="input-group">
+            <label>DISPOSITIVO</label>
             <select id="dispositivo" onchange="cargarFallas()" required>
-                <option value="">Seleccione Dispositivo...</option>
+                <option value="">Seleccione equipo...</option>
                 <option value="Computadora">Computadora (PC / Laptop)</option>
-                <option value="Red">Equipo de Red (Router / Switch)</option>
-                <option value="Impresora">Impresora / Periférico</option>
-                <option value="Telefono">Teléfono IP / Móvil</option>
+                <option value="Red">Infraestructura de Red (MikroTik / Cisco)</option>
+                <option value="Impresora">Impresora / Multifuncional</option>
+                <option value="Telefono">Telefonía IP / Comunicación</option>
             </select>
         </div>
 
         <div class="input-group">
-            <label>FALLA DETECTADA</label>
+            <label>ESPECIFICACIÓN DE LA FALLA</label>
             <select id="falla" required disabled>
-                <option value="">Primero seleccione un dispositivo...</option>
+                <option value="">Primero elija un dispositivo...</option>
             </select>
         </div>
 
         <div class="input-group">
-            <label>GESTIÓN SOLICITADA</label>
-            <select id="gestion" required>
-                <option value="Correctivo">Mantenimiento Correctivo (Reparación)</option>
-                <option value="Preventivo">Mantenimiento Preventivo (Revisión)</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <label>OBSERVACIONES (OPCIONAL)</label>
-            <textarea id="obs" rows="3" placeholder="Detalles adicionales..."></textarea>
+            <label>OBSERVACIONES ADICIONALES (OPCIONAL)</label>
+            <textarea id="obs" rows="3" placeholder="Detalles extra para TI..."></textarea>
         </div>
 
         <button type="submit" class="btn-submit" id="submitBtn">ENVIAR REPORTE</button>
@@ -110,53 +117,82 @@
 <div class="form-container" id="successView">
     <i class="fa-solid fa-circle-check check-icon"></i>
     <h2 style="font-family: 'Orbitron'; color: white;">¡RECIBIDO!</h2>
-    <p style="margin-top: 15px; color: #8b9bb4;">Muchas gracias, <span id="userName" style="color: var(--cyan);"></span>.</p>
-    <p style="margin-top: 10px; font-size: 12px;">TU NÚMERO DE TICKET ES:</p>
+    <p style="margin-top: 15px; color: #8b9bb4;">Agradecemos su reporte, <span id="userName" style="color: var(--cyan);"></span>.</p>
+    <p style="margin-top: 10px; font-size: 12px; letter-spacing: 1px;">SU NÚMERO DE TICKET:</p>
     <span class="ticket-box" id="ticketNum">#0000</span>
     <p style="color: var(--cyan); font-weight: bold; margin-top: 20px; letter-spacing: 1px;">PRONTO SERÁ CONTACTADO POR TI.</p>
-    <button onclick="location.reload()" class="btn-submit" style="background: #1a2433; margin-top: 30px;">ACEPTAR</button>
+    <button onclick="location.reload()" class="btn-submit" style="background: #1a2433; margin-top: 30px;">ENTENDIDO</button>
 </div>
 
 <script>
     const APP_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
 
-    const fallasPorDispositivo = {
-        "Computadora": ["No enciende", "Pantallazo Azul", "Lenta / Se pega", "Error de Software"],
-        "Red": ["Sin Internet", "Wi-Fi no conecta", "Cable dañado", "VPN no funciona"],
-        "Impresora": ["Atasco de papel", "No imprime", "Sin tinta / tóner", "Error de red"],
-        "Telefono": ["Sin tono", "Pantalla quebrada", "No carga", "App no abre"]
+    const fallasMaster = {
+        "Computadora": [
+            "Fallo Crítico: Pantallazo Azul (BSOD)",
+            "Hardware: No enciende / Sin energía",
+            "Rendimiento: Lentitud extrema / Disco al 100%",
+            "Software: Aplicación corporativa no abre",
+            "Seguridad: Sospecha de Virus / Malware"
+        ],
+        "Red": [
+            "Conectividad: Sin acceso a Internet (Cableado)",
+            "Wi-Fi: Desconexiones constantes / Señal débil",
+            "VPN: No conecta a la red corporativa",
+            "Hardware: Puerto de red dañado físicamente",
+            "Servicios: No carga la carpeta compartida"
+        ],
+        "Impresora": [
+            "Hardware: Atasco de papel persistente",
+            "Calidad: Impresión con manchas o rayas",
+            "Red: Impresora aparece 'Offline'",
+            "Consumibles: Cambio de Tóner / Tambor"
+        ],
+        "Telefono": [
+            "Audio: No se escucha / Micrófono dañado",
+            "Red: Teléfono IP indica 'No Service'",
+            "Hardware: Teclado pegado / Pantalla apagada"
+        ]
     };
 
+    function explicarGestion() {
+        const g = document.getElementById('gestion').value;
+        const box = document.getElementById('infoGestion');
+        box.style.display = 'block';
+        if(g === 'Preventivo') {
+            box.style.borderColor = 'var(--green)';
+            box.innerHTML = "<b style='color:var(--green)'>PREVENTIVO:</b> Tareas para evitar fallas (limpieza, parches, revisión). Mantiene el equipo en estado óptimo.";
+        } else if(g === 'Correctivo') {
+            box.style.borderColor = 'var(--red)';
+            box.innerHTML = "<b style='color:var(--red)'>CORRECTIVO:</b> Reparación de una falla activa. El equipo no funciona correctamente y requiere arreglo inmediato.";
+        } else { box.style.display = 'none'; }
+    }
+
     function cargarFallas() {
-        const disp = document.getElementById('dispositivo').value;
-        const fallaSelect = document.getElementById('falla');
-        fallaSelect.innerHTML = '<option value="">Seleccione la falla...</option>';
-        
-        if (disp) {
-            fallaSelect.disabled = false;
-            fallasPorDispositivo[disp].forEach(f => {
-                let opt = document.createElement('option');
-                opt.value = f;
-                opt.innerText = f;
-                fallaSelect.appendChild(opt);
+        const d = document.getElementById('dispositivo').value;
+        const s = document.getElementById('falla');
+        s.innerHTML = '<option value="">Seleccione falla específica...</option>';
+        if(d) {
+            s.disabled = false;
+            fallasMaster[d].forEach(f => {
+                let o = document.createElement('option');
+                o.value = f; o.innerText = f;
+                s.appendChild(o);
             });
-        } else {
-            fallaSelect.disabled = true;
-        }
+        } else { s.disabled = true; }
     }
 
     document.getElementById('reportForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
-        const nombre = document.getElementById('nombre').value;
+        const user = document.getElementById('nombre').value;
         const tNum = Math.floor(1000 + Math.random() * 9000);
 
-        btn.disabled = true;
-        btn.innerText = "ENVIANDO...";
+        btn.disabled = true; btn.innerText = "PROCESANDO REPORTE...";
 
         const payload = {
             action: "addTicket",
-            colaborador: nombre,
+            colaborador: user,
             dispositivo: document.getElementById('dispositivo').value,
             falla: document.getElementById('falla').value,
             tipo: document.getElementById('gestion').value,
@@ -165,15 +201,13 @@
 
         try {
             await fetch(APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            
             document.getElementById('formView').style.display = 'none';
             document.getElementById('successView').style.display = 'block';
-            document.getElementById('userName').innerText = nombre;
+            document.getElementById('userName').innerText = user;
             document.getElementById('ticketNum').innerText = "#" + tNum;
         } catch (err) {
-            alert("Error al enviar. Intente de nuevo.");
-            btn.disabled = false;
-            btn.innerText = "REINTENTAR";
+            alert("Error de enlace. Intente de nuevo.");
+            btn.disabled = false; btn.innerText = "REENVIAR";
         }
     });
 </script>

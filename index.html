@@ -136,7 +136,7 @@
 </div>
 
 <script>
-  // URL ÚNICA DE TU GOOGLE APPS SCRIPT
+  // URL INTEGRADA CORRECTAMENTE
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
   
   function explainGestion() {
@@ -184,9 +184,11 @@
 
     const btn = document.getElementById('btnSend');
     btn.disabled = true; btn.textContent = "ENVIANDO REPORTE...";
+    
+    // Generación de ID compatible con el Dashboard
     const tId = "TK-" + Math.random().toString(36).substr(2, 6).toUpperCase();
 
-    // Estructura de datos alineada con el motor DevSecOps
+    // Estructura de datos alineada con el motor DevSecOps para Google Sheets
     const payload = {
       action: "add",
       id: tId,
@@ -201,6 +203,7 @@
     };
 
     try {
+      // Usamos no-cors para evitar problemas de seguridad del navegador con AppScript
       await fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
@@ -209,7 +212,7 @@
         body: JSON.stringify(payload)
       });
       
-      // Feedback de éxito
+      // Simulación de éxito tras envío
       document.getElementById('formView').style.display = 'none';
       document.getElementById('userName').textContent = col;
       document.getElementById('resId').textContent = tId;

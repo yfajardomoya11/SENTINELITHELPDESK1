@@ -37,10 +37,6 @@
         .dashboard-view { display: none; }
         .dashboard-view.active { display: block; animation: fadeIn 0.4s ease; }
 
-        /* FILTRO TEMPORAL */
-        .time-filter { background: rgba(0, 123, 255, 0.05); border: 1px solid var(--border-glow); padding: 15px 25px; border-radius: 8px; margin-bottom: 25px; display: flex; align-items: center; gap: 20px; }
-        .time-select { background: #050a14; color: var(--accent-cyan); border: 1px solid var(--accent-blue); padding: 8px 15px; font-family: 'Orbitron'; font-size: 10px; outline: none; cursor: pointer; border-radius: 4px; }
-
         .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .kpi-card { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 25px; border-radius: 8px; border-bottom: 4px solid var(--accent-blue); }
         .kpi-val { font-family: 'Orbitron'; font-size: 2.2rem; font-weight: 900; display: block; margin-top: 10px; }
@@ -68,7 +64,7 @@
 
 <div id="loginOverlay">
     <div class="login-box">
-        <h2 style="font-family:'Orbitron'; color:white; margin-bottom:30px; letter-spacing:3px;">IT HELP DESK <span>CONTROL</span></h2>
+        <h2 style="font-family:'Orbitron'; color:white; margin-bottom:30px;">IT HELP DESK <span>CONTROL</span></h2>
         <input type="text" id="lUser" placeholder="ID OPERADOR" class="login-field">
         <input type="password" id="lPass" placeholder="SECURITY KEY" class="login-field">
         <button onclick="attemptLogin()" class="btn-pro" style="width:100%; padding:18px;">AUTENTICAR SISTEMA</button>
@@ -93,50 +89,40 @@
 </aside>
 
 <main class="main-content" id="mainDashboard">
-    <div class="time-filter">
-        <label style="font-family:'Orbitron'; font-size:11px; color:var(--text-secondary);">RANGO AUDITADO:</label>
-        <select id="timeRange" class="time-select" onchange="updateUI()">
-            <option value="8760">HISTÓRICO TOTAL</option>
-            <option value="720">ÚLTIMOS 30 DÍAS</option>
-            <option value="168">ÚLTIMOS 7 DÍAS</option>
-            <option value="24">ÚLTIMAS 24 HORAS</option>
-        </select>
-    </div>
-
     <div id="printArea">
         <div id="view-monitor" class="dashboard-view active">
-            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
                 <h1 style="font-family:'Orbitron'; font-size:24px; letter-spacing:8px;">SISTEMA <span>MONITOR</span></h1>
-                <div id="clock" style="font-family:'Share Tech Mono'; font-size:12px; color:var(--text-secondary);"></div>
+                <div id="clock" style="font-family:'Share Tech Mono'; color:var(--text-secondary);"></div>
             </header>
             <div class="kpi-row">
-                <div class="kpi-card"><span>ACTIVAS</span><span class="kpi-val" id="k-pend" style="color:var(--accent-cyan)">0</span></div>
+                <div class="kpi-card"><span>PENDIENTES</span><span class="kpi-val" id="k-pend" style="color:var(--accent-cyan)">0</span></div>
                 <div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICOS</span><span class="kpi-val" id="k-crit" style="color:var(--accent-red)">0</span></div>
                 <div class="kpi-card"><span>BACKLOG</span><span class="kpi-val" id="k-total">0</span></div>
-                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>NETWORK HEALTH</span><span class="kpi-val" id="k-health" style="color:var(--accent-green)">94%</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>HEALTH</span><span class="kpi-val" id="k-health" style="color:var(--accent-green)">94%</span></div>
             </div>
             <div class="charts-grid">
-                <div class="chart-box"><h4>SALUD POR SECTORES DE RED</h4><canvas id="chartM1"></canvas></div>
+                <div class="chart-box"><h4>SALUD DE RED POR SECTORES</h4><canvas id="chartM1"></canvas></div>
                 <div class="chart-box"><h4>CARGA DE INFRAESTRUCTURA</h4><canvas id="chartM2"></canvas></div>
             </div>
             <div class="table-container"><table><thead><tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>EQUIPO</th><th>ACCIÓN</th></tr></thead><tbody id="t-pend"></tbody></table></div>
         </div>
 
         <div id="view-resolved" class="dashboard-view">
-            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-                <h1 style="font-family:'Orbitron'; font-size:24px; letter-spacing:8px;">ARCHIVO <span>HISTÓRICO</span></h1>
+            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                <h1 style="font-family:'Orbitron'; font-size:24px; letter-spacing:8px;">TICKETS <span>RESUELTOS</span></h1>
             </header>
             <div class="kpi-row">
-                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>RESUELTOS</span><span class="kpi-val" id="k-res" style="color:var(--accent-green)">0</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>TERMINADOS</span><span class="kpi-val" id="k-res" style="color:var(--accent-green)">0</span></div>
                 <div class="kpi-card"><span>ÉXITO SLA</span><span class="kpi-val">100%</span></div>
-                <div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>T. RESOLUCIÓN</span><span class="kpi-val" style="color:var(--accent-cyan)">1.2h</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>T. PROMEDIO</span><span class="kpi-val" style="color:var(--accent-cyan)">1.2h</span></div>
                 <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>STATUS</span><span class="kpi-val" style="color:var(--accent-green)">ONLINE</span></div>
             </div>
             <div class="charts-grid">
-                <div class="chart-box"><h4>RATIO DE ÉXITO OPERATIVO</h4><canvas id="chartR1"></canvas></div>
-                <div class="chart-box"><h4>RENDIMIENTO TEMPORAL (TREND)</h4><canvas id="chartR2"></canvas></div>
+                <div class="chart-box"><h4>RATIO DE ÉXITO</h4><canvas id="chartR1"></canvas></div>
+                <div class="chart-box"><h4>RENDIMIENTO TEMPORAL</h4><canvas id="chartR2"></canvas></div>
             </div>
-            <div class="table-container"><table><thead><tr><th>ID</th><th>CIERRE</th><th>TÉCNICO</th><th>SOLUCIÓN TÉCNICA</th></tr></thead><tbody id="t-res"></tbody></table></div>
+            <div class="table-container"><table><thead><tr><th>ID</th><th>CIERRE</th><th>TÉCNICO</th><th>OBSERVACIÓN TÉCNICA</th></tr></thead><tbody id="t-res"></tbody></table></div>
         </div>
     </div>
 </main>
@@ -144,9 +130,9 @@
 <div id="modalObs">
     <div class="modal-content">
         <h3 style="font-family:'Orbitron'; color:var(--accent-cyan); margin-bottom:15px;">RESOLVER TICKET #<span id="modalTicketId"></span></h3>
-        <textarea id="textoObs" rows="5" placeholder="Describa la solución técnica aplicada..." class="login-field" style="text-align:left;"></textarea>
+        <textarea id="textoObs" rows="5" placeholder="Describa la solución técnica..." class="login-field" style="text-align:left;"></textarea>
         <div style="display:flex; gap:10px;">
-            <button onclick="cerrarModal()" style="flex:1; background:none; border:1px solid gray; color:white; cursor:pointer;">ATRÁS</button>
+            <button onclick="cerrarModal()" style="flex:1; background:none; border:1px solid gray; color:white; cursor:pointer;">CANCELAR</button>
             <button onclick="enviarResolucion()" style="flex:2; background:var(--accent-green); border:none; font-family:'Orbitron'; font-weight:bold; cursor:pointer; color:black;">CONFIRMAR CIERRE</button>
         </div>
     </div>
@@ -192,34 +178,25 @@
                 return n;
             });
             updateUI();
-        } catch(e) { console.error("Error Telemetría"); }
-    }
-
-    function filterByTime(data) {
-        const hours = parseInt(document.getElementById('timeRange').value);
-        const now = new Date();
-        return data.filter(t => {
-            const dateStr = t['ticket resuelto'] || t['fecha'] || new Date().toISOString();
-            const ticketDate = new Date(dateStr);
-            return (now - ticketDate) / (1000 * 60 * 60) <= hours;
-        });
+        } catch(e) { console.error("Error de Red"); }
     }
 
     function updateUI() {
-        const timeFiltered = filterByTime(fullData);
-        const pend = timeFiltered.filter(t => t.estado && t.estado.toLowerCase().trim() === 'pendiente');
-        const res = timeFiltered.filter(t => t.estado && t.estado.toLowerCase().trim() === 'resuelto');
+        const pend = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'pendiente');
+        const res = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'resuelto');
         
         document.getElementById('k-pend').textContent = pend.length;
-        document.getElementById('k-crit').textContent = pend.filter(x => x.prioridad === 'Alta').length;
+        document.getElementById('k-crit').textContent = pend.filter(x => x.prioridad && x.prioridad.toLowerCase().trim() === 'alta').length;
         document.getElementById('k-total').textContent = fullData.length;
         document.getElementById('k-res').textContent = res.length;
 
-        document.getElementById('t-pend').innerHTML = pend.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" class="btn-pro" style="padding:2px 8px;">CERRAR</button></td></tr>`).join('');
-        document.getElementById('t-res').innerHTML = res.map(t => `<tr><td>#${t.id}</td><td>${t['ticket resuelto'] || 'S/F'}</td><td>${t.colaborador}</td><td style="font-family:'Share Tech Mono'; color:var(--accent-cyan); font-size:11px;">${t.observaciones || 'LOGS OK'}</td></tr>`).join('');
+        // LLENAR TABLA PENDIENTES
+        document.getElementById('t-pend').innerHTML = pend.map(t => `<tr><td>#${t.id}</td><td>${t.prioridad}</td><td>${t.técnico || t.colaborador}</td><td>${t.equipo || t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" class="btn-pro" style="padding:2px 8px;">LOG</button></td></tr>`).join('');
+        
+        // LLENAR TABLA RESUELTOS CON OBSERVACIONES
+        document.getElementById('t-res').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t['ticket resuelto'] || 'S/F'}</td><td>${t.técnico || t.colaborador}</td><td style="font-family:'Share Tech Mono'; color:var(--accent-cyan); font-size:11px;">${t.observaciones || 'OK'}</td></tr>`).join('');
 
-        renderMCharts(pend);
-        renderRCharts(res);
+        renderMCharts(pend); renderRCharts(res);
     }
 
     function renderMCharts(data) {
@@ -235,7 +212,7 @@
         const ctx1 = document.getElementById('chartR1').getContext('2d');
         const ctx2 = document.getElementById('chartR2').getContext('2d');
         if(charts.r1) charts.r1.destroy(); if(charts.r2) charts.r2.destroy();
-        charts.r1 = new Chart(ctx1, { type: 'doughnut', data: { labels: ['Éxito', 'SLA'], datasets: [{ data: [98, 2], backgroundColor: ['#00ffa3', '#333'], cutout: '80%', borderWidth: 0 }] }, options: { responsive:true, maintainAspectRatio:false } });
+        charts.r1 = new Chart(ctx1, { type: 'doughnut', data: { labels: ['OK', 'SLA'], datasets: [{ data: [98, 2], backgroundColor: ['#00ffa3', '#333'], cutout: '80%', borderWidth: 0 }] }, options: { responsive:true, maintainAspectRatio:false } });
         charts.r2 = new Chart(ctx2, { type: 'line', data: { labels: ['L','M','M','J','V'], datasets: [{ data: [5, 12, 10, 15, 13], borderColor: '#00ffa3', tension: 0.3 }] }, options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { display: false } } } });
     }
 
@@ -261,46 +238,17 @@
     async function generateExecutiveReport() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
-        const printArea = document.getElementById('printArea');
-        const timeLabel = document.getElementById('timeRange').options[document.getElementById('timeRange').selectedIndex].text;
-        const btn = document.querySelector('.nav-item[onclick="generateExecutiveReport()"]');
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PROCESANDO...';
-
-        try {
-            const canvas = await html2canvas(printArea, { backgroundColor: '#020406', scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            
-            // PDF ESTILO AUDITORÍA PRO
-            doc.setFillColor(2, 4, 6); doc.rect(0, 0, 210, 297, 'F');
-            doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255);
-            doc.setFontSize(22); doc.text("AUDITORÍA ESTRATÉGICA TI", 15, 25);
-            
-            doc.setFontSize(10); doc.setTextColor(139, 155, 180);
-            doc.text("RESPONSABLE: " + document.getElementById('displayUser').innerText, 15, 35);
-            doc.text("RANGO AUDITADO: " + timeLabel, 15, 40);
-            doc.text("FECHA DE EMISIÓN: " + new Date().toLocaleString(), 15, 45);
-            
-            doc.setDrawColor(0, 123, 255); doc.line(15, 50, 195, 50);
-            doc.addImage(imgData, 'PNG', 10, 55, 190, 100);
-            
-            // SECCIÓN DE ANÁLISIS SERIO
-            doc.setFontSize(12); doc.setTextColor(0, 255, 163);
-            doc.text("1. RESUMEN EJECUTIVO DE OPERACIONES", 15, 170);
-            doc.setFontSize(10); doc.setTextColor(240, 245, 255);
-            doc.text(`Durante el periodo "${timeLabel}", el departamento de TI ha gestionado la infraestructura bajo parámetros de alta disponibilidad.`, 15, 180);
-            doc.text("- Se mantiene una salud de red promediada en 94% mediante monitoreo preventivo.", 15, 186);
-            doc.text("- La resolución de incidentes críticos se ha priorizado para evitar tiempos de inactividad.", 15, 192);
-
-            doc.setFontSize(12); doc.setTextColor(0, 255, 163);
-            doc.text("2. IMPACTO Y VALOR AGREGADO DE TI", 15, 210);
-            doc.setFontSize(10); doc.setTextColor(240, 245, 255);
-            doc.text("La gestión sistemática de tickets no solo resuelve fallas, sino que asegura la continuidad del negocio:", 15, 220);
-            doc.text("- Optimización de recursos: Reducción de latencia en servicios críticos.", 15, 226);
-            doc.text("- Seguridad: Mitigación de riesgos mediante hardening de sectores de red auditados.", 15, 232);
-            doc.text("- Reportabilidad: Transparencia total en el cumplimiento de los SLA corporativos.", 15, 238);
-
-            doc.save(`AUDITORIA_SENTINEL_${new Date().getTime()}.pdf`);
-        } catch (e) { alert("Error PDF"); } finally { btn.innerHTML = '<i class="fa-solid fa-file-invoice"></i> GENERAR AUDITORÍA'; }
+        const canvas = await html2canvas(document.getElementById('printArea'), { backgroundColor: '#020406', scale: 2 });
+        doc.setFillColor(2, 4, 6); doc.rect(0, 0, 210, 297, 'F');
+        doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255);
+        doc.setFontSize(22); doc.text("AUDITORÍA ESTRATÉGICA TI", 15, 25);
+        doc.setFontSize(10); doc.setTextColor(139, 155, 180);
+        doc.text("RESPONSABLE: " + document.getElementById('displayUser').innerText, 15, 35);
+        doc.setDrawColor(0, 123, 255); doc.line(15, 50, 195, 50);
+        doc.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 60, 190, 100);
+        doc.setFontSize(12); doc.setTextColor(0, 255, 163);
+        doc.text("ANÁLISIS: Operatividad de red estable al 94%.", 15, 175);
+        doc.save(`REPORTE_TI_${new Date().getTime()}.pdf`);
     }
 
     setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleString().toUpperCase(); }, 1000);

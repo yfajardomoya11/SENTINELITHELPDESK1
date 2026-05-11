@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT COMMAND CENTER v5.6 | Final Flash</title>
+    <title>IT COMMAND CENTER v6.0 | Final Flash</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -20,132 +19,83 @@
             --sidebar-expanded: 300px; --sidebar-collapsed: 80px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; display: flex; overflow-x: hidden; min-height: 100vh; }
-        body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0, 123, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 123, 255, 0.03) 1px, transparent 1px); background-size: 35px 35px; pointer-events: none; z-index: 0; }
-
-        /* LOGIN */
+        body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; display: flex; min-height: 100vh; overflow-x: hidden; }
+        
         #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 50px; border-radius: 8px; width: 420px; text-align: center; border-top: 4px solid var(--accent-blue); }
         .login-field { width: 100%; background: #050a14; border: 1px solid var(--border-subtle); padding: 15px; color: white; margin-bottom: 20px; outline: none; font-family: 'Share Tech Mono'; }
 
-        /* SIDEBAR */
-        .sidebar { width: var(--sidebar-expanded); background: var(--bg-sidebar); backdrop-filter: blur(25px); border-right: 1px solid var(--border-subtle); height: 100vh; position: fixed; left: 0; top: 0; z-index: 1000; display: none; flex-direction: column; transition: width 0.3s ease; }
-        .sidebar.collapsed { width: var(--sidebar-collapsed); }
-        .sidebar-header { padding: 30px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); font-family: 'Orbitron'; color: var(--accent-cyan); font-size: 10px; }
-        .user-card { margin: 25px 15px; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--accent-purple); background: linear-gradient(135deg, rgba(157, 80, 187, 0.1), transparent); }
-        .sidebar.collapsed .user-info { display: none; }
-        .user-avatar { min-width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-weight: 900; border: 2px solid #fff; background: var(--accent-purple); }
-        .nav-item { padding: 20px 25px; color: var(--text-secondary); cursor: pointer; font-family: 'Orbitron'; font-size: 10px; transition: 0.2s; border-left: 3px solid transparent; display: flex; align-items: center; gap: 20px; white-space: nowrap; }
-        .sidebar.collapsed .nav-text { display: none; }
-        .nav-item:hover, .nav-item.active { background: rgba(0, 229, 255, 0.1); border-left-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .sidebar { width: var(--sidebar-expanded); background: var(--bg-sidebar); border-right: 1px solid var(--border-subtle); height: 100vh; position: fixed; display: none; flex-direction: column; z-index: 1000; }
+        .nav-item { padding: 20px 25px; color: var(--text-secondary); cursor: pointer; font-family: 'Orbitron'; font-size: 10px; display: flex; align-items: center; gap: 15px; border-left: 3px solid transparent; }
+        .nav-item.active { background: rgba(0, 229, 255, 0.1); border-left-color: var(--accent-cyan); color: var(--accent-cyan); }
 
-        /* MAIN */
-        .main-content { flex: 1; margin-left: var(--sidebar-expanded); padding: 40px; transition: 0.3s ease; }
-        body.sidebar-is-collapsed .main-content { margin-left: var(--sidebar-collapsed); }
+        .main-content { flex: 1; margin-left: var(--sidebar-expanded); padding: 40px; }
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 8px; border-bottom: 4px solid var(--accent-blue); }
+        .kpi-val { font-family: 'Orbitron'; font-size: 2rem; display: block; margin-top: 10px; }
+
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .chart-box { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 15px; height: 300px; border-radius: 8px; }
         
-        .time-filter { background: rgba(0, 123, 255, 0.05); border: 1px solid var(--border-subtle); padding: 15px 25px; border-radius: 8px; margin-bottom: 25px; display: flex; align-items: center; gap: 20px; }
-        .time-select { background: #050a14; color: var(--accent-cyan); border: 1px solid var(--accent-blue); padding: 8px 15px; font-family: 'Orbitron'; font-size: 10px; outline: none; cursor: pointer; border-radius: 4px; }
-
-        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
-        .kpi-card { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 25px; border-radius: 8px; position: relative; }
-        .kpi-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--accent-blue); }
-        .kpi-val { font-family: 'Orbitron'; font-size: 2.2rem; font-weight: 900; color: #fff; display: block; margin-top: 10px; }
-        
-        .charts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 40px; }
-        .chart-box { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 20px; height: 350px; border-radius: 12px; }
-        .chart-box h4 { font-family: 'Orbitron'; font-size: 10px; color: var(--accent-cyan); margin-bottom: 20px; letter-spacing: 2px; }
-
-        .table-container { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .table-container { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
-        th { padding: 18px; text-align: left; background: rgba(0, 123, 255, 0.05); color: var(--accent-blue); font-family: 'Share Tech Mono'; font-size: 11px; }
-        td { padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; color: var(--text-secondary); }
+        th { padding: 15px; text-align: left; background: rgba(0, 123, 255, 0.05); color: var(--accent-blue); font-family: 'Share Tech Mono'; font-size: 11px; }
+        td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; color: var(--text-secondary); }
 
-        #modalObs { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:10000; align-items:center; justify-content:center; backdrop-filter:blur(15px); }
-        .modal-content { background:var(--bg-card); border:1px solid var(--accent-blue); padding:40px; width:500px; border-radius:12px; }
+        #modalObs { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:10000; align-items:center; justify-content:center; backdrop-filter:blur(10px); }
+        .modal-content { background:var(--bg-card); border:1px solid var(--accent-blue); padding:30px; width:450px; border-radius:8px; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
     <div class="login-box">
-        <h2 style="font-family:'Orbitron'; color:white; margin-bottom:30px;">IT HELP DESK <span>CONTROL</span></h2>
-        <input type="text" id="lUser" placeholder="ID OPERADOR" class="login-field">
-        <input type="password" id="lPass" placeholder="SECURITY KEY" class="login-field">
-        <button onclick="attemptLogin()" style="width:100%; padding:15px; background:var(--accent-blue); color:white; border:none; font-family:'Orbitron'; cursor:pointer; font-weight:bold;">AUTENTICAR SISTEMA</button>
+        <h2 style="font-family:'Orbitron'; margin-bottom:30px;">IT SYSTEM <span>v6.0</span></h2>
+        <input type="text" id="lUser" placeholder="OPERADOR" class="login-field">
+        <input type="password" id="lPass" placeholder="PASSWORD" class="login-field">
+        <button onclick="attemptLogin()" style="width:100%; padding:15px; background:var(--accent-blue); color:white; border:none; font-family:'Orbitron'; cursor:pointer;">ACCEDER</button>
     </div>
 </div>
 
 <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <span class="nav-text">IT COMMAND v5.6</span>
-        <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="cursor:pointer; color:var(--accent-cyan);"></i>
-    </div>
-    <div class="user-card">
-        <div class="user-avatar" id="userAvatar">--</div>
-        <div class="user-info">
-            <span id="displayUser" style="font-weight:700; font-size:13px; display:block;">---</span>
-            <span id="displayRank" style="font-size:8px; font-family:'Orbitron'; color:var(--text-secondary);">---</span>
-        </div>
+    <div style="padding:25px; font-family:'Orbitron'; color:var(--accent-cyan); font-size:12px;">COMMAND CENTER</div>
+    <div class="user-card" style="padding:0 20px 20px;">
+        <div id="displayUser" style="font-weight:bold; font-size:13px;">---</div>
+        <div id="displayRank" style="font-size:9px; color:var(--text-secondary);">ESPECIALISTA IT</div>
     </div>
     <nav>
-        <div class="nav-item active" id="navMonitor" onclick="setView('monitor')"><i class="fa-solid fa-chart-line"></i><span class="nav-text">MONITOR GENERAL</span></div>
-        <div class="nav-item" id="navResolved" onclick="setView('resolved')"><i class="fa-solid fa-check-circle"></i><span class="nav-text">TICKETS RESUELTOS</span></div>
-        <div class="nav-item" onclick="generateITReport()" style="color:var(--accent-cyan);"><i class="fa-solid fa-file-pdf"></i><span class="nav-text">INFORME DE AUDITORÍA</span></div>
+        <div class="nav-item active" id="navMonitor" onclick="setView('monitor')"><i class="fa-solid fa-terminal"></i> MONITOR</div>
+        <div class="nav-item" id="navResolved" onclick="setView('resolved')"><i class="fa-solid fa-check-double"></i> RESUELTOS</div>
+        <div class="nav-item" onclick="syncData()" style="color:var(--accent-cyan);"><i class="fa-solid fa-sync"></i> RE-SYNC</div>
     </nav>
 </aside>
 
 <main class="main-content" id="mainDashboard" style="display:none;">
-    <div class="time-filter">
-        <label style="font-family:'Orbitron'; font-size:11px; color:var(--text-secondary);">RANGO DE DATOS:</label>
-        <select id="timeRange" class="time-select" onchange="updateUI()">
-            <option value="8760">HISTÓRICO TOTAL</option>
-            <option value="720">30 DÍAS</option>
-            <option value="168">7 DÍAS</option>
-            <option value="24">24 HORAS</option>
-        </select>
-    </div>
-
-    <div id="reportZone">
-        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h1 id="viewTitle" style="font-family:'Orbitron'; font-size:22px; letter-spacing:5px;">MONITOR <span>GENERAL</span></h1>
-            <button onclick="syncData()" style="background:transparent; border:1px solid var(--accent-cyan); color:var(--accent-cyan); padding:8px 20px; cursor:pointer; font-family:'Orbitron'; font-size:10px; border-radius:4px;">RE-SYNC TELEMETRY</button>
-        </header>
-        <div class="kpi-row" id="kpiContainer"></div>
-        <div class="charts-grid">
-            <div class="chart-box"><h4>CARGA POR EQUIPO</h4><canvas id="chart1"></canvas></div>
-            <div class="chart-box"><h4>KPI DE EFICIENCIA</h4><canvas id="chart2"></canvas></div>
-            <div class="chart-box"><h4>SALUD DEL SISTEMA</h4><canvas id="chart3"></canvas></div>
-        </div>
+    <h1 id="viewTitle" style="font-family:'Orbitron'; margin-bottom:30px; letter-spacing:3px;">SISTEMA <span>ACTIVO</span></h1>
+    <div class="kpi-row" id="kpiContainer"></div>
+    <div class="charts-grid">
+        <div class="chart-box"><h4>CARGA PRIORIDAD</h4><canvas id="chart1"></canvas></div>
+        <div class="chart-box"><h4>SLA STATUS</h4><canvas id="chart2"></canvas></div>
+        <div class="chart-box"><h4>TELEMETRÍA RED</h4><canvas id="chart3"></canvas></div>
     </div>
     <div class="table-container"><table><thead id="tHead"></thead><tbody id="tBody"></tbody></table></div>
 </main>
 
 <div id="modalObs">
     <div class="modal-content">
-        <h3 style="font-family:'Orbitron'; color:var(--accent-cyan); margin-bottom:15px;">RESOLVER: <span id="modalTicketId"></span></h3>
-        <textarea id="textoObs" rows="5" placeholder="Logs técnicos de solución..." class="login-field" style="text-align:left;"></textarea>
+        <h3 style="font-family:'Orbitron'; color:var(--accent-cyan); margin-bottom:15px;">CERRAR TICKET #<span id="modalTicketId"></span></h3>
+        <textarea id="textoObs" rows="4" placeholder="Logs de la solución..." class="login-field" style="text-align:left;"></textarea>
         <div style="display:flex; gap:10px;">
-            <button onclick="cerrarModal()" style="flex:1; background:none; border:1px solid gray; color:white; cursor:pointer;">ABORTAR</button>
-            <button onclick="enviarResolucion()" style="flex:2; background:var(--accent-green); border:none; font-family:'Orbitron'; font-weight:bold; cursor:pointer;">SUBMIT</button>
+            <button onclick="cerrarModal()" style="flex:1; background:none; border:1px solid gray; color:white; cursor:pointer;">ATRÁS</button>
+            <button onclick="enviarResolucion()" style="flex:2; background:var(--accent-green); border:none; font-family:'Orbitron'; font-weight:bold; cursor:pointer; color:black;">CONFIRMAR</button>
         </div>
     </div>
 </div>
 
 <script>
-    // URL DEFINIDA POR EL USUARIO
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
-    
-    const USERS = { 
-        "admin": { name: "YANANTH FAJARDO MOYA", rank: "ESPECIALISTA EN INFRAESTRUCTURA", pass: "Admin2026!", init: "YF", color: "#9d50bb" }
-    };
-
+    const USERS = { "admin": { name: "YANANTH FAJARDO", pass: "Admin2026!" } };
     let fullData = []; let charts = {}; let currentView = 'monitor'; let ticketIdResolviendo = null;
-
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('collapsed');
-        document.body.classList.toggle('sidebar-is-collapsed');
-        setTimeout(() => { Object.values(charts).forEach(c => c && c.resize()); }, 350);
-    }
 
     function attemptLogin() {
         const u = document.getElementById('lUser').value.trim();
@@ -155,25 +105,21 @@
             document.getElementById('sidebar').style.display = 'flex';
             document.getElementById('mainDashboard').style.display = 'block';
             document.getElementById('displayUser').textContent = USERS[u].name;
-            document.getElementById('displayRank').textContent = USERS[u].rank;
-            document.getElementById('userAvatar').textContent = USERS[u].init;
-            document.getElementById('userAvatar').style.background = USERS[u].color;
             syncData();
-        } else { alert("ACCESO DENEGADO"); }
+        } else { alert("ERROR"); }
     }
 
     async function syncData() { 
         try { 
             const r = await fetch(SCRIPT_URL); 
             const json = await r.json();
-            // Normalización para leer las columnas del Excel
             fullData = json.map(t => {
                 let n = {};
                 for (let k in t) n[k.toLowerCase().trim()] = t[k];
                 return n;
             });
             updateUI(); 
-        } catch(e) { console.error("Error de Telemetría"); } 
+        } catch(e) { console.error("Sync Error"); } 
     }
 
     function setView(v) { 
@@ -183,35 +129,22 @@
         updateUI(); 
     }
 
-    function filterDataByTime(data) {
-        const hours = parseInt(document.getElementById('timeRange').value);
-        const now = new Date();
-        return data.filter(t => {
-            const dateStr = t['ticket resuelto'] || t['fecha'] || new Date().toISOString();
-            const ticketDate = new Date(dateStr);
-            return (now - ticketDate) / (1000 * 60 * 60) <= hours;
-        });
-    }
-
     function updateUI() {
-        const timeFiltered = filterDataByTime(fullData);
-        // Filtros robustos para el Excel
-        const pend = timeFiltered.filter(t => t.estado && t.estado.toLowerCase().trim() === 'pendiente');
-        const res = timeFiltered.filter(t => t.estado && t.estado.toLowerCase().trim() === 'resuelto');
+        const pend = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'pendiente');
+        const res = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'resuelto');
         const box = document.getElementById('kpiContainer');
         
         if(currentView === 'monitor') {
-            document.getElementById('viewTitle').innerHTML = "MONITOR <span>GENERAL</span>";
-            box.innerHTML = `<div class="kpi-card"><span>ACTIVAS</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICAS</span><span class="kpi-val">${pend.filter(x=>x.prioridad==='Alta').length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-amber)"><span>TOTAL TRAMITADOS</span><span class="kpi-val">${fullData.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>SLA OK</span><span class="kpi-val">99%</span></div>`;
-            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>DISPOSITIVO</th><th>ACCIÓN</th></tr>`;
-            document.getElementById('tBody').innerHTML = pend.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" style="background:var(--accent-green); color:black; padding:5px 12px; border:none; border-radius:4px; font-family:'Orbitron'; font-size:9px; font-weight:bold; cursor:pointer;">RESOLVER</button></td></tr>`).join('');
+            document.getElementById('viewTitle').innerHTML = "MONITOR <span>TICKETS ACTIVOS</span>";
+            box.innerHTML = `<div class="kpi-card"><span>PENDIENTES</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICOS</span><span class="kpi-val">${pend.filter(x=>x.prioridad && x.prioridad.toLowerCase().includes('alta')).length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-amber)"><span>HISTÓRICO</span><span class="kpi-val">${fullData.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>UPTIME</span><span class="kpi-val">99.9%</span></div>`;
+            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>EQUIPO</th><th>ACCIÓN</th></tr>`;
+            document.getElementById('tBody').innerHTML = pend.map(t => `<tr><td>#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" style="background:var(--accent-green); border:none; padding:5px 10px; cursor:pointer; border-radius:4px; font-family:'Orbitron'; font-size:9px;">RESOLVER</button></td></tr>`).join('');
             renderCharts(pend);
         } else {
-            document.getElementById('viewTitle').innerHTML = "TICKETS <span>RESUELTOS</span>";
-            box.innerHTML = `<div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>CERRADOS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>ÉXITO</span><span class="kpi-val">100%</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-blue)"><span>TIEMPO MEDIO</span><span class="kpi-val">1.2h</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span>SISTEMA</span><span class="kpi-val">UP</span></div>`;
-            // Mapeo de columnas J y K del Excel
-            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>FECHA CIERRE</th><th>TÉCNICO RESP.</th><th>OBSERVACIÓN DE CIERRE</th><th>ESTADO</th></tr>`;
-            document.getElementById('tBody').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t['ticket resuelto'] || '---'}</td><td>${t.colaborador}</td><td style="max-width:300px; color:var(--accent-cyan); font-family:'Share Tech Mono';">${t.observaciones || 'Sin logs'}</td><td style="color:var(--accent-green); font-weight:bold;">DONE</td></tr>`).join('');
+            document.getElementById('viewTitle').innerHTML = "HISTORIAL <span>SOLUCIONADOS</span>";
+            box.innerHTML = `<div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>CERRADOS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card"><span>ÉXITO</span><span class="kpi-val">100%</span></div><div class="kpi-card"><span>AVG TIME</span><span class="kpi-val">1.2h</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span>SISTEMA</span><span class="kpi-val">OK</span></div>`;
+            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>FECHA CIERRE</th><th>TÉCNICO</th><th>SOLUCIÓN TÉCNICA</th></tr>`;
+            document.getElementById('tBody').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan);">#${t.id}</td><td>${t['ticket resuelto'] || 'S/F'}</td><td>${t.colaborador}</td><td style="font-family:'Share Tech Mono'; font-size:11px; color:var(--accent-cyan);">${t.observaciones || 'OK'}</td></tr>`).join('');
             renderCharts(res);
         }
     }
@@ -221,56 +154,19 @@
         const c2 = document.getElementById('chart2').getContext('2d');
         const c3 = document.getElementById('chart3').getContext('2d');
         if(charts.c1) charts.c1.destroy(); if(charts.c2) charts.c2.destroy(); if(charts.c3) charts.c3.destroy();
-        const baseOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b9bb4' } }, x: { grid: { display: false }, ticks: { color: '#8b9bb4' } } } };
-
-        if(currentView === 'monitor') {
-            charts.c1 = new Chart(c1, { type: 'radar', data: { labels: ['Red','PC','Lap','Tel','Per'], datasets: [{ data: [12, 19, 10, 5, 8], borderColor: '#00e5ff', backgroundColor: 'rgba(0,229,255,0.2)' }] }, options: { ...baseOpts, scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#8b9bb4' }, ticks: { display: false } } } } });
-            charts.c2 = new Chart(c2, { type: 'bar', data: { labels: ['Alta', 'Normal'], datasets: [{ data: [data.filter(x=>x.prioridad==='Alta').length, data.filter(x=>x.prioridad==='Normal').length], backgroundColor: ['#ff3d6b', '#007bff'], borderRadius: 5 }] }, options: baseOpts });
-            charts.c3 = new Chart(c3, { type: 'polarArea', data: { labels: ['HW','SW','Net','Sec','Ops'], datasets: [{ data: [20, 15, 25, 10, 30], backgroundColor: ['#007bff','#00ffa3','#ffb300','#9d50bb','#ff3d6b'], borderWidth: 0 }] }, options: { ...baseOpts, scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { display: false } } } } });
-        } else {
-            charts.c1 = new Chart(c1, { type: 'line', data: { labels: ['D-4','D-3','D-2','D-1','HOY'], datasets: [{ data: [3, 7, 15, 10, 12], borderColor: '#00ffa3', tension: 0.4, fill: true, backgroundColor: 'rgba(0,255,163,0.1)' }] }, options: baseOpts });
-            charts.c2 = new Chart(c2, { type: 'doughnut', data: { labels: ['OK','SLA'], datasets: [{ data: [95, 5], backgroundColor: ['#00e5ff','#ff3d6b'], borderWidth: 0 }] }, options: { ...baseOpts, scales: { x: { display: false }, y: { display: false } } } });
-            charts.c3 = new Chart(c3, { type: 'bar', data: { labels: ['Server','User','Network','Cloud'], datasets: [{ data: [15, 40, 25, 20], backgroundColor: '#ffb300', borderRadius: 4 }] }, options: baseOpts });
-        }
-    }
-
-    async function generateITReport() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const reportZone = document.getElementById('reportZone');
-        const btn = document.querySelector('.nav-item[onclick="generateITReport()"]');
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span class="nav-text">PROCESANDO...</span>';
-
-        try {
-            const canvas = await html2canvas(reportZone, { backgroundColor: '#020406', scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            doc.setFillColor(2, 4, 6);
-            doc.rect(0, 0, 210, 297, 'F');
-            doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255);
-            doc.setFontSize(18); doc.text("INFORME ESTRATÉGICO DE INFRAESTRUCTURA IT", 10, 18);
-            doc.addImage(imgData, 'PNG', 5, 45, 200, 100);
-            doc.setFontSize(10); doc.setTextColor(240, 245, 255);
-            doc.text("ANÁLISIS DE IMPACTO CORPORATIVO:", 10, 155);
-            const lines = ["- Estabilidad del entorno mantenida al 99.9%.", "- Resolución sistemática de incidencias operativas.", "- Optimización de costos por mitigación de inactividad."];
-            lines.forEach((l, i) => doc.text(l, 12, 163 + (i * 8)));
-            doc.save(`IT_AUDIT_V56_${new Date().getTime()}.pdf`);
-        } catch (e) { console.error(e); } finally { btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i><span class="nav-text">INFORME DE AUDITORÍA</span>'; }
+        charts.c1 = new Chart(c1, { type: 'bar', data: { labels: ['Alta', 'Normal'], datasets: [{ data: [data.filter(x=>x.prioridad && x.prioridad.toLowerCase().includes('alta')).length, 10], backgroundColor: ['#ff3d6b', '#007bff'] }] }, options: { responsive:true, maintainAspectRatio:false } });
+        charts.c2 = new Chart(c2, { type: 'doughnut', data: { labels: ['OK','SLA'], datasets: [{ data: [95, 5], backgroundColor: ['#00ffa3','#333'] }] }, options: { responsive:true, maintainAspectRatio:false } });
+        charts.c3 = new Chart(c3, { type: 'line', data: { labels: ['D4','D3','D2','D1','HOY'], datasets: [{ data: [2, 8, 5, 12, 10], borderColor: '#00e5ff', fill: true }] }, options: { responsive:true, maintainAspectRatio:false } });
     }
 
     function abrirModal(id) { ticketIdResolviendo = id; document.getElementById('modalTicketId').textContent = id; document.getElementById('modalObs').style.display='flex'; }
     function cerrarModal() { document.getElementById('modalObs').style.display='none'; }
-    
     async function enviarResolucion() {
         const obs = document.getElementById('textoObs').value.trim();
         if(!obs) return;
-        await fetch(SCRIPT_URL, { 
-            method: "POST", 
-            mode: "no-cors", 
-            body: JSON.stringify({ action: "updateStatus", id: ticketIdResolviendo, observations: obs }) 
-        });
+        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateStatus", id: ticketIdResolviendo, observations: obs }) });
         cerrarModal(); setTimeout(syncData, 1500);
     }
 </script>
 </body>
-</html>
 </html>

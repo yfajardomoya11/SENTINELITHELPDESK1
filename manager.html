@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT HELP DESK CONTROL v8.0</title>
+    <title>IT HELP DESK CONTROL v8.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -121,7 +121,7 @@
         </div>
         <div class="table-wrap">
             <table>
-                <thead><tr><th>ID</th><th>FECHA CIERRE</th><th>COLABORADOR</th><th>OBSERVACIÓN</th></tr></thead>
+                <thead><tr><th>ID</th><th>CIERRE</th><th>COLABORADOR</th><th>OBSERVACIÓN</th></tr></thead>
                 <tbody id="body-historico"></tbody>
             </table>
         </div>
@@ -173,13 +173,19 @@
 
     async function sync() {
         try {
-            const res = await fetch(URL);
+            // Agregamos un timestamp para evitar que el navegador guarde caché vieja
+            const res = await fetch(URL + "?t=" + new Date().getTime());
             const json = await res.json();
-            // Normalización de datos para evitar errores de nombres de columna
+            
+            // Limpiamos datos viejos antes de mapear
+            fullData = [];
             fullData = json.map(r => {
                 let clean = {};
                 for(let k in r) {
-                    let key = k.toLowerCase().trim().replace(/\s+/g, '');
+                    // Normalización total: minúsculas, sin espacios, sin tildes
+                    let key = k.toLowerCase().trim()
+                              .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                              .replace(/\s+/g, '');
                     clean[key] = r[k];
                 }
                 return clean;
@@ -195,12 +201,12 @@
         let pc=0, rc=0, cc=0;
 
         fullData.forEach(t => {
-            const est = (t.estado || "").toLowerCase().trim();
+            const est = (t.estado || "").toString().toLowerCase().trim();
             const id = t.id || "---";
 
             if(est === 'pendiente' || est === '') {
                 pc++; 
-                if((t.prioridad||"").toLowerCase() === 'alta') cc++;
+                if((t.prioridad||"").toString().toLowerCase() === 'alta') cc++;
                 mBody.innerHTML += `<tr>
                     <td style="color:var(--cyan); font-weight:bold;">#${id}</td>
                     <td>${t.prioridad || 'Media'}</td>
@@ -250,7 +256,7 @@
         if(!obs) return alert('Describa la solución técnica.');
         
         const btn = document.getElementById('confirmBtn'); 
-        btn.disabled=true; btn.innerText="PROCESANDO...";
+        btn.disabled=true; btn.innerText="ARCHIVANDO...";
 
         try {
             await fetch(URL, { 
@@ -263,8 +269,8 @@
             btn.disabled=false; 
             btn.innerText="CONFIRMAR Y CERRAR";
             
-            // Espera un momento para que Google Script termine de escribir antes de re-sincronizar
-            setTimeout(sync, 2000);
+            // Forzamos un delay de 3 segundos para que Google Sheets guarde antes de refrescar
+            setTimeout(sync, 3000);
         } catch (e) {
             alert("Error al cerrar ticket.");
             btn.disabled=false;
@@ -281,7 +287,8 @@
         doc.save(`INFORME_TI_${new Date().getTime()}.pdf`);
     }
 
-    setInterval(sync, 60000); // Sync automático cada minuto
+    // Sync automático cada minuto
+    setInterval(sync, 60000);
 </script>
 </body>
 </html>

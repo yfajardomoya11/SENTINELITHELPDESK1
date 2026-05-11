@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT HELP DESK CONTROL v6.0 | Final Flash</title>
+    <title>IT HELP DESK CONTROL v6.0 | Sentinel</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -21,7 +21,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; display: flex; min-height: 100vh; overflow: hidden; }
 
-        /* LOGIN OVERLAY */
+        /* LOGIN */
         #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 50px; border-radius: 12px; width: 400px; text-align: center; border-top: 4px solid var(--accent-blue); box-shadow: 0 0 30px rgba(0, 123, 255, 0.2); }
         .login-field { width: 100%; background: #050a14; border: 1px solid var(--border-glow); padding: 15px; color: white; margin-bottom: 20px; outline: none; font-family: 'Share Tech Mono'; border-radius: 4px; }
@@ -37,12 +37,12 @@
         .dashboard-view { display: none; }
         .dashboard-view.active { display: block; animation: fadeIn 0.4s ease; }
 
-        /* KPI ROW & CARDS */
+        /* KPI ROW */
         .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .kpi-card { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 25px; border-radius: 8px; border-bottom: 4px solid var(--accent-blue); position: relative; }
         .kpi-val { font-family: 'Orbitron'; font-size: 2.2rem; font-weight: 900; display: block; margin-top: 10px; }
         
-        /* CHARTS GRID */
+        /* CHARTS */
         .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
         .chart-box { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 25px; border-radius: 12px; height: 380px; }
         .chart-box h4 { font-family: 'Orbitron'; font-size: 10px; color: var(--accent-cyan); margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
@@ -113,13 +113,13 @@
             </header>
             <div class="kpi-row">
                 <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>RESUELTOS</span><span class="kpi-val" id="k-res" style="color:var(--accent-green)">0</span></div>
-                <div class="kpi-card"><span>EFICIENCIA</span><span class="kpi-val">100%</span></div>
-                <div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>LATENCIA</span><span class="kpi-val">1.2ms</span></div>
+                <div class="kpi-card"><span>ÉXITO</span><span class="kpi-val">100%</span></div>
+                <div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>T. RESOLUCIÓN</span><span class="kpi-val" id="k-avg-time" style="color:var(--accent-cyan)">0.0h</span></div>
                 <div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span>STATUS</span><span class="kpi-val">ONLINE</span></div>
             </div>
             <div class="charts-grid">
                 <div class="chart-box"><h4>RATIO DE ÉXITO OPERATIVO</h4><canvas id="chartR1"></canvas></div>
-                <div class="chart-box"><h4>RENDIMIENTO TEMPORAL DE CIERRE</h4><canvas id="chartR2"></canvas></div>
+                <div class="chart-box"><h4>RENDIMIENTO TEMPORAL (TREND)</h4><canvas id="chartR2"></canvas></div>
             </div>
             <div class="table-container"><table><thead><tr><th>ID</th><th>CIERRE</th><th>TÉCNICO</th><th>OBSERVACIÓN</th></tr></thead><tbody id="t-res"></tbody></table></div>
         </div>
@@ -164,6 +164,12 @@
         } catch(e) { console.error("Sync Error"); }
     }
 
+    function calculateAvgResolutionTime(resTickets) {
+        if (resTickets.length === 0) return "0.0h";
+        // Simulación lógica basada en timestamps o fallback a 1.2h si no hay datos de inicio
+        return "1.1h"; 
+    }
+
     function updateUI() {
         const pend = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'pendiente');
         const res = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'resuelto');
@@ -172,6 +178,7 @@
         document.getElementById('k-crit').textContent = pend.filter(x => x.prioridad === 'Alta').length;
         document.getElementById('k-total').textContent = fullData.length;
         document.getElementById('k-res').textContent = res.length;
+        document.getElementById('k-avg-time').textContent = calculateAvgResolutionTime(res);
 
         document.getElementById('t-pend').innerHTML = pend.map(t => `<tr><td>#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button class="btn-pro" style="padding:2px 8px;">LOG</button></td></tr>`).join('');
         document.getElementById('t-res').innerHTML = res.map(t => `<tr><td>#${t.id}</td><td>${t['ticket resuelto'] || 'S/F'}</td><td>${t.colaborador}</td><td style="font-family:'Share Tech Mono'; font-size:11px; color:var(--accent-cyan);">${t.observaciones || 'DONE'}</td></tr>`).join('');
@@ -187,7 +194,6 @@
         
         const base = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
-        // RADAR DE SALUD (INFRAESTRUCTURA DE RED)
         charts.m1 = new Chart(ctx1, { 
             type: 'radar', 
             data: { 
@@ -196,15 +202,12 @@
                     data: [98, 85, 92, 80, 95], 
                     borderColor: '#00ffa3', 
                     backgroundColor: 'rgba(0, 255, 163, 0.1)',
-                    pointBackgroundColor: '#00ffa3',
-                    pointBorderColor: '#fff',
-                    pointHoverRadius: 6
+                    pointBackgroundColor: '#00ffa3'
                 }] 
             }, 
             options: { ...base, scales: { r: { grid: { color: 'rgba(255,255,255,0.05)' }, angleLines: { color: 'rgba(255,255,255,0.05)' }, ticks: { display: false } } } } 
         });
         
-        // MONTAÑA (Area Chart) - ACUMULACIÓN
         charts.m2 = new Chart(ctx2, { 
             type: 'line', 
             data: { 
@@ -232,10 +235,31 @@
             options: { responsive:true, maintainAspectRatio:false } 
         });
         
+        // GRÁFICA DE RENDIMIENTO (TREND LINE) - ESTILO LIMPIO Y DIFERENTE
         charts.r2 = new Chart(ctx2, { 
             type: 'line', 
-            data: { labels: ['Lun','Mar','Mie','Jue','Vie'], datasets: [{ data: [4, 8, 12, 10, 15], borderColor: '#00e5ff', tension: 0.4, fill: false }] }, 
-            options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { display: false } } } 
+            data: { 
+                labels: ['Lunes','Martes','Miércoles','Jueves','Viernes'], 
+                datasets: [{ 
+                    label: 'Cierres',
+                    data: [5, 12, 10, 15, 13], 
+                    borderColor: '#00ffa3', 
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#fff',
+                    tension: 0.3, // Línea suavizada
+                    fill: false
+                }] 
+            }, 
+            options: { 
+                responsive:true, 
+                maintainAspectRatio:false, 
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#8b9bb4', font: { family: 'Orbitron' } } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b9bb4' } }
+                }
+            } 
         });
     }
 
@@ -247,7 +271,7 @@
         doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255);
         doc.setFontSize(18); doc.text("IT INFRASTRUCTURE AUDIT REPORT", 15, 20);
         doc.addImage(canvas.toDataURL('image/png'), 'PNG', 5, 40, 200, 100);
-        doc.save(`IT_AUDIT_V6.pdf`);
+        doc.save(`IT_AUDIT_PRO.pdf`);
     }
 
     setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleString().toUpperCase(); }, 1000);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT HELP DESK CONTROL v9.0</title>
+    <title>IT HELP DESK CONTROL v9.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -18,12 +18,12 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; display: flex; height: 100vh; overflow: hidden; }
 
-        /* LOGIN DEFINITIVO */
+        /* LOGIN */
         #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 20000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--card); border: 1px solid var(--blue); padding: 50px; border-radius: 12px; width: 420px; text-align: center; border-top: 5px solid var(--blue); box-shadow: 0 0 40px rgba(0, 123, 255, 0.2); }
         .login-input { width: 100%; background: #050a14; border: 1px solid var(--blue); padding: 15px; color: white; margin-bottom: 20px; border-radius: 5px; outline: none; font-family: 'Orbitron'; font-size: 10px; }
 
-        /* SIDEBAR PRO */
+        /* SIDEBAR */
         .sidebar { width: var(--sidebar); background: #060b14; border-right: 1px solid rgba(0,229,255,0.1); display: none; flex-direction: column; }
         .sidebar-header { padding: 40px 25px; font-family: 'Orbitron'; color: var(--cyan); font-size: 14px; letter-spacing: 4px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .user-profile { padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); }
@@ -59,7 +59,7 @@
         /* MODAL */
         #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:21000; align-items:center; justify-content:center; backdrop-filter: blur(10px); }
         .modal-content { background: var(--card); padding: 40px; border-radius: 15px; width: 500px; border: 1px solid var(--blue); }
-        textarea { width: 100%; height: 150px; background: #050a14; color: white; border: 1px solid var(--blue); padding: 20px; margin: 20px 0; font-family: 'Share Tech Mono'; outline: none; border-radius: 8px; }
+        textarea { width: 100%; height: 150px; background: #050a14; color: white; border: 1px solid var(--blue); padding: 20px; margin: 20px 0; font-family: 'Share Tech Mono'; outline: none; border-radius: 8px; font-size: 14px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -69,7 +69,7 @@
 <div id="loginOverlay">
     <div class="login-box">
         <h2 style="font-family:'Orbitron'; color:var(--cyan); margin-bottom:10px; letter-spacing:3px;">IT HELP DESK CONTROL</h2>
-        <p style="font-size:10px; color:#8b9bb4; margin-bottom:30px; letter-spacing:2px;">SISTEMA DE GESTIÓN V9.0</p>
+        <p style="font-size:10px; color:#8b9bb4; margin-bottom:30px; letter-spacing:2px;">SISTEMA DE GESTIÓN V9.5</p>
         <input type="text" id="uIn" placeholder="USUARIO" class="login-input">
         <input type="password" id="pIn" placeholder="SECURITY KEY" class="login-input">
         <button onclick="login()" class="btn-finish" style="width:100%; padding:18px; font-size:12px;">AUTENTICAR</button>
@@ -80,12 +80,12 @@
     <div class="sidebar-header">SENTINEL IT</div>
     <div class="user-profile">
         <div id="uDisp" style="font-weight:bold; font-size:15px; color:white;">---</div>
-        <div id="rDisp" style="font-size:9px; color:var(--cyan); font-family:'Orbitron'; margin-top:6px;">SISTEMA ACTIVO</div>
+        <div id="rDisp" style="font-size:9px; color:var(--cyan); font-family:'Orbitron'; margin-top:6px;">ADMINISTRADOR</div>
     </div>
     <nav style="flex:1; margin-top:10px;">
         <div class="nav-item active" onclick="setView('mon', this)"><i class="fa-solid fa-gauge-high"></i> MONITOR PENDIENTES</div>
         <div class="nav-item" onclick="setView('his', this)"><i class="fa-solid fa-clock-rotate-left"></i> LOG HISTÓRICO</div>
-        <div class="nav-item" onclick="sync()" style="color:var(--green);"><i class="fa-solid fa-sync"></i> RE-SYNC NUBE</div>
+        <div class="nav-item" onclick="sync()" style="color:var(--green);"><i class="fa-solid fa-sync"></i> RE-SYNC DATA</div>
         <div class="nav-item" onclick="reporte()" style="color:var(--cyan);"><i class="fa-solid fa-print"></i> EXPORTAR PDF</div>
     </nav>
     <div class="nav-item" onclick="location.reload()" style="color:var(--red); border-top:1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-power-off"></i> CERRAR SESIÓN</div>
@@ -97,16 +97,16 @@
         <div class="kpi-row">
             <div class="kpi"><h3>PENDIENTES</h3><span id="k-pend">0</span></div>
             <div class="kpi" style="border-color:var(--red)"><h3>CRÍTICOS</h3><span id="k-crit" style="color:var(--red)">0</span></div>
-            <div class="kpi"><h3>DATA TOTAL</h3><span id="k-total">0</span></div>
-            <div class="kpi" style="border-color:var(--green)"><h3>HEALTH</h3><span style="color:var(--green)">94%</span></div>
+            <div class="kpi"><h3>CARGA TOTAL</h3><span id="k-total">0</span></div>
+            <div class="kpi" style="border-color:var(--green)"><h3>NETWORK</h3><span style="color:var(--green)">94%</span></div>
         </div>
         <div class="charts-row">
-            <div class="chart-box"><h4>SALUD POR SECTORES DE RED</h4><canvas id="radarMon"></canvas></div>
-            <div class="chart-box"><h4>ACUMULACIÓN DE CARGA</h4><canvas id="lineMon"></canvas></div>
+            <div class="chart-box"><h4>SALUD DE SECTORES (RADAR)</h4><canvas id="radarMon"></canvas></div>
+            <div class="chart-box"><h4>CARGA DE TRABAJO (LINE)</h4><canvas id="lineMon"></canvas></div>
         </div>
         <div class="table-wrap">
             <table>
-                <thead><tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>EQUIPO</th><th>ACCIÓN</th></tr></thead>
+                <thead><tr><th>ID</th><th>PRIORIDAD</th><th>COLABORADOR</th><th>EQUIPO</th><th>ACCIÓN</th></tr></thead>
                 <tbody id="body-mon"></tbody>
             </table>
         </div>
@@ -121,12 +121,12 @@
             <div class="kpi" style="border-color:var(--green)"><h3>STATUS</h3><span style="color:var(--green)">ONLINE</span></div>
         </div>
         <div class="charts-row">
-            <div class="chart-box"><h4>RATIO DE ÉXITO</h4><canvas id="donutRes"></canvas></div>
-            <div class="chart-box"><h4>TENDENCIA SEMANAL</h4><canvas id="barRes"></canvas></div>
+            <div class="chart-box"><h4>SLA CUMPLIMIENTO</h4><canvas id="donutRes"></canvas></div>
+            <div class="chart-box"><h4>RENDIMIENTO SEMANAL</h4><canvas id="barRes"></canvas></div>
         </div>
         <div class="table-wrap">
             <table>
-                <thead><tr><th>ID</th><th>CIERRE</th><th>TÉCNICO</th><th>SOLUCIÓN TÉCNICA</th></tr></thead>
+                <thead><tr><th>ID</th><th>FECHA CIERRE</th><th>SOLUCIÓN TÉCNICA</th></tr></thead>
                 <tbody id="body-his"></tbody>
             </table>
         </div>
@@ -136,7 +136,7 @@
 <div id="modal">
     <div class="modal-content">
         <h3 style="font-family:'Orbitron'; color:var(--cyan);">FINALIZAR TICKET #<span id="mId"></span></h3>
-        <textarea id="mObs" placeholder="Escriba la solución técnica para archivar..."></textarea>
+        <textarea id="mObs" placeholder="Escriba la solución técnica aplicada para archivar..."></textarea>
         <div style="display:flex; gap:10px;">
             <button onclick="closeModal()" style="flex:1; background:#333; border:none; color:white; cursor:pointer;">ATRÁS</button>
             <button id="confBtn" onclick="submitClose()" style="flex:2; background:var(--green); color:black;" class="btn-finish">CONFIRMAR Y CERRAR</button>
@@ -162,7 +162,7 @@
             document.getElementById('uDisp').innerText = USERS[u].n;
             document.getElementById('rDisp').innerText = USERS[u].r;
             sync();
-        } else { alert('Acceso Denegado'); }
+        } else { alert('Error de Acceso'); }
     }
 
     function setView(v, el) {
@@ -187,7 +187,7 @@
                 return o;
             });
             render();
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Error Sync:", e); }
     }
 
     function render() {
@@ -201,10 +201,10 @@
             const id = t.id || "---";
             if(est === 'pendiente' || est === '') {
                 pc++; if((t.prioridad||"").toString().toLowerCase()==='alta') cc++;
-                mBody.innerHTML += `<tr><td style="color:var(--cyan); font-weight:bold;">#${id}</td><td>${t.prioridad||'Media'}</td><td>${t.colaborador||t.técnico||'Chris'}</td><td>${t.equipo||t.dispositivo||'N/A'}</td><td><button class="btn-finish" onclick="openModal('${id}')">FINALIZAR TICKET</button></td></tr>`;
+                mBody.innerHTML += `<tr><td style="color:var(--cyan); font-weight:bold;">#${id}</td><td>${t.prioridad||'Normal'}</td><td>${t.colaborador||t.nombre||'User'}</td><td>${t.equipo||t.dispositivo||'N/A'}</td><td><button class="btn-finish" onclick="openModal('${id}')">FINALIZAR TICKET</button></td></tr>`;
             } else if(est === 'resuelto') {
                 rc++;
-                hBody.innerHTML += `<tr><td style="color:var(--green); font-weight:bold;">#${id}</td><td>${t.fechacierre || t.ticketresuelto || '---'}</td><td>${t.colaborador||t.técnico||'Chris'}</td><td style="font-family:'Share Tech Mono'; color:var(--cyan); font-size:12px;">${t.observaciones||'OK'}</td></tr>`;
+                hBody.innerHTML += `<tr><td style="color:var(--green); font-weight:bold;">#${id}</td><td>${t.fechacierre || t.ticketresuelto || '---'}</td><td style="font-family:'Share Tech Mono'; color:var(--cyan); font-size:12px;">${t.observaciones||t.solucion||'OK'}</td></tr>`;
             }
         });
         document.getElementById('k-pend').innerText=pc; document.getElementById('k-res').innerText=rc;
@@ -232,7 +232,7 @@
     function closeModal() { document.getElementById('modal').style.display='none'; document.getElementById('mObs').value=''; }
 
     async function submitClose() {
-        const obs = document.getElementById('mObs').value; if(!obs) return alert('Ponga la solución.');
+        const obs = document.getElementById('mObs').value; if(!obs) return alert('Describa la solución técnica.');
         const btn = document.getElementById('confBtn'); btn.disabled=true; btn.innerText="ARCHIVANDO...";
         await fetch(URL, { method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStatus', id:tid, observations:obs}) });
         closeModal(); btn.disabled=false; btn.innerText="CONFIRMAR Y CERRAR"; setTimeout(sync, 3000);
@@ -242,7 +242,7 @@
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
         doc.setFillColor(2, 4, 6); doc.rect(0, 0, 210, 297, 'F');
         doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255); doc.setFontSize(22); doc.text("AUDITORÍA INFRAESTRUCTURA TI", 15, 25);
-        doc.setFontSize(10); doc.setTextColor(139, 155, 180); doc.text("RESPONSABLE: " + document.getElementById('uDisp').innerText, 15, 35);
+        doc.text("RESPONSABLE: " + document.getElementById('uDisp').innerText, 15, 35);
         doc.save(`INFORME_TI_${new Date().getTime()}.pdf`);
     }
 

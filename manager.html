@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SENTINEL — IT COMMAND CENTER</title>
+<title>IT HELP DESK — COMMAND CENTER</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -14,8 +14,7 @@
   :root { 
     --bg-primary: #020406; --bg-sidebar: rgba(6, 11, 20, 0.98); --bg-card: #0a0e17; 
     --accent-blue: #007bff; --accent-cyan: #00e5ff; --accent-green: #00ffa3;
-    --accent-purple: #9d50bb; --accent-indigo: #6e48aa;
-    --accent-red: #ff3d6b; --accent-amber: #ffb300;
+    --accent-purple: #9d50bb; --accent-red: #ff3d6b; --accent-amber: #ffb300;
     --text-primary: #f0f5ff; --text-secondary: #8b9bb4; --border-subtle: rgba(0, 229, 255, 0.15); 
     --sidebar-expanded: 300px; --sidebar-collapsed: 80px;
   }
@@ -52,7 +51,7 @@
     padding: 30px 20px; display: flex; align-items: center; justify-content: space-between;
     border-bottom: 1px solid var(--border-subtle); font-family: 'Orbitron'; color: var(--accent-cyan); font-size: 10px; 
   }
-  .toggle-btn { cursor: pointer; font-size: 20px; color: var(--accent-cyan); transition: 0.3s; }
+  .toggle-btn { cursor: pointer; font-size: 20px; color: var(--accent-cyan); }
 
   .user-card { margin: 25px 15px; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
   .sidebar.collapsed .user-info { display: none; }
@@ -90,7 +89,7 @@
   .modal-content { background:var(--bg-card); border:1px solid var(--accent-blue); padding:40px; width:500px; border-radius:12px; border-top: 4px solid var(--accent-blue); }
 </style>
 </head>
-<body class="">
+<body>
 
 <div id="loginOverlay">
   <div class="login-box">
@@ -106,7 +105,7 @@
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <span class="nav-text">COMMAND CENTER v3.0</span>
+    <span class="nav-text">IT COMMAND v3.5</span>
     <div class="toggle-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></div>
   </div>
   <div class="user-card" id="profileCard" style="border-color:var(--accent-purple)">
@@ -127,11 +126,11 @@
     </div>
     <div class="nav-item" onclick="processAuditPDF()" style="color:var(--accent-cyan)">
       <i class="fa-solid fa-file-pdf"></i>
-      <span class="nav-text">GENERAR AUDITORÍA PDF</span>
+      <span class="nav-text">REPORT PDF</span>
     </div>
     <div class="nav-item" onclick="exportToCSV()" style="color:var(--accent-amber)">
       <i class="fa-solid fa-file-csv"></i>
-      <span class="nav-text">EXPORTAR CSV</span>
+      <span class="nav-text">EXPORT CSV</span>
     </div>
   </nav>
 </aside>
@@ -139,14 +138,14 @@
 <main class="main-content" id="mainDashboard" style="display:none;">
   <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
     <h1 id="viewTitle" style="font-family:'Orbitron'; font-size:22px; letter-spacing:5px;">MONITOR <span>GENERAL</span></h1>
-    <button onclick="syncData()" style="background:transparent; border:1px solid var(--accent-cyan); color:var(--accent-cyan); padding:10px 25px; cursor:pointer; font-family:'Orbitron'; font-size:10px; border-radius:4px;">RE-SYNC TELEMETRY</button>
+    <button onclick="syncData()" style="background:transparent; border:1px solid var(--accent-cyan); color:var(--accent-cyan); padding:10px 25px; cursor:pointer; font-family:'Orbitron'; font-size:10px; border-radius:4px;">RE-SYNC DATA</button>
   </header>
   
   <div class="kpi-row" id="kpiContainer"></div>
   <div class="charts-grid" id="captureZone">
-    <div class="chart-box"><h4>DEVICE DISTRIBUTION</h4><canvas id="chart1"></canvas></div>
-    <div class="chart-box"><h4>WORKLOAD ANALYSIS</h4><canvas id="chart2"></canvas></div>
-    <div class="chart-box"><h4>SYSTEM HEALTH</h4><canvas id="chart3"></canvas></div>
+    <div class="chart-box"><h4>DEVICE ANALYSIS</h4><canvas id="chart1"></canvas></div>
+    <div class="chart-box"><h4>LOAD DISTRIBUTION</h4><canvas id="chart2"></canvas></div>
+    <div class="chart-box"><h4>SYSTEM PERFORMANCE</h4><canvas id="chart3"></canvas></div>
   </div>
   <div class="table-container"><table id="mainTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div>
 </main>
@@ -154,7 +153,7 @@
 <div id="modalObs">
   <div class="modal-content">
     <h3 style="font-family:'Orbitron'; color:var(--accent-cyan); margin-bottom:15px; font-size:14px;">RESOLVER NODO: <span id="modalTicketId"></span></h3>
-    <textarea id="textoObs" rows="5" placeholder="Documente la solución técnica aplicada (Status OK)..." style="width:100%; background:#050a14; border:1px solid var(--border-subtle); color:white; padding:20px; margin-bottom:25px; outline:none; font-family:'Share Tech Mono';"></textarea>
+    <textarea id="textoObs" rows="5" placeholder="Logs técnicos de solución..." style="width:100%; background:#050a14; border:1px solid var(--border-subtle); color:white; padding:20px; margin-bottom:25px; outline:none; font-family:'Share Tech Mono';"></textarea>
     <div style="display:flex; gap:15px;"><button onclick="cerrarModal()" style="flex:1; background:none; border:1px solid gray; color:white; cursor:pointer;">ABORTAR</button><button onclick="enviarResolucion()" style="flex:2; background:var(--accent-green); border:none; font-family:'Orbitron'; font-weight:bold; cursor:pointer;">CERRAR TICKET</button></div>
   </div>
 </div>
@@ -218,15 +217,15 @@
     
     if(currentView === 'monitor') {
       document.getElementById('viewTitle').innerHTML = "MONITOR <span>GENERAL</span>";
-      box.innerHTML = `<div class="kpi-card"><span class="kpi-label">ACTIVAS</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span class="kpi-label">ALTA PRIORIDAD</span><span class="kpi-val">${pend.filter(x=>x.prioridad==='Alta').length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-amber)"><span class="kpi-label">PENDIENTES</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span class="kpi-label">RED SALUD</span><span class="kpi-val">UP</span></div>`;
+      box.innerHTML = `<div class="kpi-card"><span class="kpi-label">ACTIVAS</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span class="kpi-label">CRÍTICAS</span><span class="kpi-val">${pend.filter(x=>x.prioridad==='Alta').length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-amber)"><span class="kpi-label">EN COLA</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span class="kpi-label">ESTADO RED</span><span class="kpi-val">UP</span></div>`;
       head.innerHTML = `<tr><th>ID</th><th>PRIORIDAD</th><th>COLABORADOR</th><th>DISPOSITIVO</th><th>ACCION</th></tr>`;
       body.innerHTML = pend.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" style="background:var(--accent-green); color:black; padding:5px 10px; border:none; cursor:pointer; font-weight:bold; font-family:'Orbitron'; font-size:9px; border-radius:4px;">RESOLVER</button></td></tr>`).join('');
       renderCharts(pend);
     } else {
       document.getElementById('viewTitle').innerHTML = "TICKETS <span>RESUELTOS</span>";
-      box.innerHTML = `<div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span class="kpi-label">TOTAL OK</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span class="kpi-label">EFICIENCIA</span><span class="kpi-val">98%</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-blue)"><span class="kpi-label">AUDITADOS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span class="kpi-label">ESTADO</span><span class="kpi-val">OK</span></div>`;
-      head.innerHTML = `<tr><th>ID</th><th>TECNICO</th><th>BITÁCORA TÉCNICA</th><th>FECHA</th><th>ESTADO</th></tr>`;
-      body.innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.colaborador}</td><td>${t.observaciones||'OK'}</td><td>${t['ticket resuelto']||'---'}</td><td style="color:var(--accent-green)">CLOSED</td></tr>`).join('');
+      box.innerHTML = `<div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span class="kpi-label">RESUELTOS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span class="kpi-label">EFICIENCIA</span><span class="kpi-val">98%</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-blue)"><span class="kpi-label">REGISTROS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span class="kpi-label">STATUS</span><span class="kpi-val">OK</span></div>`;
+      head.innerHTML = `<tr><th>ID</th><th>TECNICO</th><th>SOLUCIÓN TÉCNICA</th><th>FECHA CIERRE</th><th>ESTADO</th></tr>`;
+      body.innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.colaborador}</td><td>${t.observaciones||'OK'}</td><td>${t['ticket resuelto']||'---'}</td><td style="color:var(--accent-green); font-weight:bold">CLOSED</td></tr>`).join('');
       renderCharts(res);
     }
   }
@@ -241,82 +240,82 @@
     const opts = { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: '#8b9bb4' }, grid: { display: false } }, x: { ticks: { color: '#8b9bb4' }, grid: { display: false } }, r: { angleLines: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { display: false }, pointLabels: { color: '#8b9bb4', font: { size: 10 } } } }, plugins: { legend: { labels: { color: '#8b9bb4' } } } };
 
     if(currentView === 'monitor') {
-      charts.c1 = new Chart(ctx1, { type: 'radar', data: { labels: Object.keys(dev), datasets: [{ label: 'Incidencias', data: Object.values(dev), borderColor: '#00e5ff', backgroundColor: 'rgba(0,229,255,0.2)', fill: true }] }, options: opts });
+      charts.c1 = new Chart(ctx1, { type: 'radar', data: { labels: Object.keys(dev), datasets: [{ label: 'Tickets', data: Object.values(dev), borderColor: '#00e5ff', backgroundColor: 'rgba(0,229,255,0.2)', fill: true }] }, options: opts });
     } else {
-      charts.c1 = new Chart(ctx1, { type: 'line', data: { labels: data.slice(-7).map(t=>t.id), datasets: [{ label: 'Workload', data: [2, 1, 3, 1, 0.5, 2, 1.2], borderColor: '#00ffa3', tension: 0.4, fill: true, backgroundColor: 'rgba(0,255,163,0.1)' }] }, options: opts });
+      charts.c1 = new Chart(ctx1, { type: 'line', data: { labels: data.slice(-7).map(t=>t.id), datasets: [{ label: 'SLA History', data: [2, 1, 3, 1, 0.5, 2, 1], borderColor: '#00ffa3', tension: 0.4, fill: true, backgroundColor: 'rgba(0,255,163,0.1)' }] }, options: opts });
     }
-    charts.c2 = new Chart(ctx2, { type: 'bar', data: { labels: ['Alta', 'Normal'], datasets: [{ label: 'Priority', data: [data.filter(t=>t.prioridad==='Alta').length, data.filter(t=>t.prioridad!=='Alta').length], backgroundColor: ['#ff3d6b', '#007bff'] }] }, options: opts });
+    charts.c2 = new Chart(ctx2, { type: 'bar', data: { labels: ['Alta', 'Normal'], datasets: [{ label: 'Workload', data: [data.filter(t=>t.prioridad==='Alta').length, data.filter(t=>t.prioridad!=='Alta').length], backgroundColor: ['#ff3d6b', '#007bff'] }] }, options: opts });
     charts.c3 = new Chart(ctx3, { type: 'polarArea', data: { labels: ['Net', 'Sec', 'HW', 'SW', 'Ops'], datasets: [{ data: [15, 25, 20, 30, 10], backgroundColor: ['#00ffa3', '#9d50bb', '#007bff', '#ffb300', '#ff3d6b'] }] }, options: opts });
   }
 
-  // --- FUNCIÓN AUDITORÍA PDF AK7 ---
+  // --- REPORTE IT HELP DESK PDF ---
   async function processAuditPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
     const now = new Date();
     const resueltos = fullData.filter(x => x.estado === 'Resuelto');
 
-    // 1. HEADER OSCURO PROFESIONAL
+    // HEADER
     doc.setFillColor(3, 5, 8);
     doc.rect(0, 0, 210, 50, 'F');
     
-    doc.setTextColor(0, 229, 255); // Cyan
+    doc.setTextColor(0, 229, 255);
     doc.setFontSize(22);
-    doc.text("SENTINEL AUDIT REPORT", 15, 20);
+    doc.text("IT HELP DESK REPORT", 15, 22);
     
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
-    doc.text(`ESPECIALISTA: ${currentUser.name}`, 15, 33);
-    doc.text(`RANGO: ${currentUser.rank}`, 15, 38);
-    doc.text(`TIMESTAMP: ${now.toLocaleString()}`, 15, 43);
+    doc.text(`AUDITOR: ${currentUser.name}`, 15, 34);
+    doc.text(`EMPRESA: IT SERVICES COSTA RICA`, 15, 39);
+    doc.text(`FECHA DE EMISIÓN: ${now.toLocaleString()}`, 15, 44);
 
-    // SELLO DE VERIFICACIÓN
+    // SELLO AZUL
     doc.setDrawColor(0, 229, 255);
-    doc.setLineWidth(0.5);
     doc.rect(150, 15, 45, 20);
     doc.setFontSize(8);
-    doc.text("VERIFIED BY SENTINEL", 172.5, 23, null, null, "center");
-    doc.text("IT-PROFESSIONAL OK", 172.5, 28, null, null, "center");
+    doc.text("APPROVED BY IT DEPT", 172.5, 24, null, null, "center");
+    doc.text("SECURE STATUS: OK", 172.5, 29, null, null, "center");
 
-    // 2. RESUMEN EJECUTIVO
-    doc.setTextColor(40, 40, 40);
-    doc.setFontSize(14);
-    doc.text("1. RESUMEN DE GESTIÓN TÉCNICA", 15, 65);
-    doc.setFontSize(10);
-    const summary = `El presente documento certifica la auditoría de incidencias procesadas por ${currentUser.name}. Se han finalizado con éxito ${resueltos.length} tickets, alcanzando una eficiencia operativa del 98%. El sistema de infraestructura permanece estable y bajo monitoreo constante.`;
-    doc.text(doc.splitTextToSize(summary, 180), 15, 75);
+    // ANÁLISIS DETALLADO
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(13);
+    doc.text("I. ANÁLISIS DE INFRAESTRUCTURA Y SOPORTE", 15, 65);
+    doc.setFontSize(9);
+    const summary = `Este reporte detalla la gestión técnica de ${currentUser.name}. Se han cerrado ${resueltos.length} incidentes bajo protocolos DevSecOps. Las métricas indican una alta disponibilidad del sistema y una resolución de tickets críticos en tiempos menores al SLA establecido.`;
+    doc.text(doc.splitTextToSize(summary, 180), 15, 74);
 
-    // 3. CAPTURA DE GRÁFICAS (Telemetría Directa)
-    doc.setFontSize(14);
-    doc.text("2. TELEMETRÍA DE INCIDENTES", 15, 100);
+    // MÉTRICAS VISUALES
+    doc.setFontSize(13);
+    doc.text("II. TELEMETRÍA DE CARGA Y PERFORMANCE", 15, 95);
     
-    const canvas = document.getElementById('chart1');
-    const imgData = canvas.toDataURL("image/png");
-    doc.addImage(imgData, 'PNG', 15, 110, 85, 85);
-    
-    const canvas3 = document.getElementById('chart3');
-    const imgData3 = canvas3.toDataURL("image/png");
-    doc.addImage(imgData3, 'PNG', 110, 120, 80, 70);
+    try {
+      const c1 = document.getElementById('chart1').toDataURL("image/png");
+      doc.addImage(c1, 'PNG', 15, 105, 85, 85);
+      const c3 = document.getElementById('chart3').toDataURL("image/png");
+      doc.addImage(c3, 'PNG', 110, 110, 80, 75);
+    } catch(e) { doc.text("[Telemetría no disponible]", 15, 110); }
 
-    // 4. BITÁCORA DE RESOLUCIÓN (Últimos 5)
-    doc.setFontSize(14);
-    doc.text("3. BITÁCORA DE CIERRES RECIENTES", 15, 210);
-    let y = 220;
+    // BITÁCORA
+    doc.setFontSize(13);
+    doc.text("III. BITÁCORA DE INCIDENTES RESUELTOS (TOP 5)", 15, 205);
+    let y = 215;
     resueltos.slice(-5).forEach(t => {
-      doc.setFontSize(9);
+      doc.setFontSize(8);
       doc.setTextColor(0, 123, 255);
-      doc.text(`ID #${t.id} - ${t.dispositivo}`, 15, y);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Solución: ${t.observaciones || 'OK'}`, 15, y + 5);
-      y += 12;
+      doc.text(`ID #${t.id} — ${t.dispositivo}`, 15, y);
+      doc.setTextColor(80, 80, 80);
+      doc.text(`Acción técnica: ${t.observaciones || 'OK'}`, 15, y + 4);
+      y += 10;
     });
 
-    // FOOTER
+    // CIERRE PROFESIONAL
+    doc.setDrawColor(200, 200, 200);
+    doc.line(15, 268, 80, 268);
     doc.setFontSize(8);
-    doc.setTextColor(180, 180, 180);
-    doc.text("ESTE DOCUMENTO ES PROPIEDAD DE IT HELP DESK CONTROL. CLASIFICADO: INTERNO.", 105, 285, null, null, "center");
+    doc.text("FIRMA DEL RESPONSABLE", 15, 273);
+    doc.text(currentUser.name, 15, 277);
 
-    doc.save(`SENTINEL_AUDIT_${currentUser.init}.pdf`);
+    doc.save(`IT_HELP_DESK_REPORT_${currentUser.init}.pdf`);
   }
 
   function exportToCSV() {
@@ -327,7 +326,7 @@
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `SENTINEL_AUDIT_${new Date().toLocaleDateString()}.csv`;
+    link.download = `IT_AUDIT_${new Date().toLocaleDateString()}.csv`;
     link.click();
   }
 
@@ -335,7 +334,7 @@
   function cerrarModal() { document.getElementById('modalObs').style.display='none'; }
   async function enviarResolucion() {
     const obs = document.getElementById('textoObs').value.trim();
-    if(!obs) return alert("LOG TÉCNICO REQUERIDO");
+    if(!obs) return alert("LOG REQUERIDO");
     try {
       await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateStatus", id: ticketIdResolviendo, newStatus: "Resuelto", observations: obs }) });
       cerrarModal(); setTimeout(syncData, 1500);

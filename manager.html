@@ -3,296 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT HELP DESK CONTROL v6.0 | Sentinel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>SENTINEL IT CONTROL v6.5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root { 
-            --bg-primary: #020406; --bg-sidebar: #060b14; --bg-card: #0a0e17; 
-            --accent-blue: #007bff; --accent-cyan: #00e5ff; --accent-green: #00ffa3;
-            --accent-red: #ff3d6b; --text-primary: #f0f5ff; --text-secondary: #8b9bb4;
-            --border-glow: rgba(0, 229, 255, 0.15); --sidebar-width: 280px;
+            --bg: #020406; --card: #0a0e17; --blue: #007bff; --cyan: #00e5ff; 
+            --green: #00ffa3; --red: #ff3d6b; --text: #f0f5ff; --sidebar: 260px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; display: flex; min-height: 100vh; overflow: hidden; }
+        body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; display: flex; height: 100vh; overflow: hidden; }
 
-        /* LOGIN OVERLAY */
-        #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 50px; border-radius: 12px; width: 420px; text-align: center; border-top: 4px solid var(--accent-blue); box-shadow: 0 0 30px rgba(0, 123, 255, 0.2); }
-        .login-field { width: 100%; background: #050a14; border: 1px solid var(--border-glow); padding: 15px; color: white; margin-bottom: 20px; outline: none; font-family: 'Share Tech Mono'; border-radius: 4px; }
+        /* LOGIN */
+        #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: var(--card); border: 1px solid var(--blue); padding: 40px; border-radius: 10px; width: 350px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #050a14; border: 1px solid var(--blue); color: white; border-radius: 5px; }
 
         /* SIDEBAR */
-        .sidebar { width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border-glow); height: 100vh; position: fixed; display: none; flex-direction: column; z-index: 1000; }
-        .sidebar-header { padding: 30px; font-family: 'Orbitron'; color: var(--accent-cyan); font-size: 11px; letter-spacing: 2px; border-bottom: 1px solid var(--border-glow); text-align: center; }
-        .nav-item { padding: 18px 30px; color: var(--text-secondary); cursor: pointer; font-family: 'Orbitron'; font-size: 10px; display: flex; align-items: center; gap: 15px; border-left: 3px solid transparent; transition: 0.3s; }
-        .nav-item.active { background: rgba(0, 229, 255, 0.05); border-left-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .sidebar { width: var(--sidebar); background: #060b14; border-right: 1px solid rgba(0,229,255,0.1); display: none; flex-direction: column; }
+        .nav-item { padding: 20px; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s; color: #8b9bb4; font-family: 'Orbitron'; font-size: 11px; }
+        .nav-item.active { background: rgba(0,229,255,0.05); border-left-color: var(--cyan); color: var(--cyan); }
 
-        /* MAIN CONTENT */
-        .main-content { flex: 1; margin-left: var(--sidebar-width); padding: 40px; overflow-y: auto; display: none; }
-        .dashboard-view { display: none; }
-        .dashboard-view.active { display: block; animation: fadeIn 0.4s ease; }
+        /* CONTENT */
+        .main { flex: 1; padding: 30px; overflow-y: auto; display: none; }
+        .view { display: none; }
+        .view.active { display: block; }
 
-        /* FILTRO TEMPORAL */
-        .time-filter { background: rgba(0, 123, 255, 0.05); border: 1px solid var(--border-glow); padding: 15px 25px; border-radius: 8px; margin-bottom: 25px; display: flex; align-items: center; gap: 20px; }
-        .time-select { background: #050a14; color: var(--accent-cyan); border: 1px solid var(--accent-blue); padding: 8px 15px; font-family: 'Orbitron'; font-size: 10px; outline: none; cursor: pointer; border-radius: 4px; }
-
-        /* KPI ROW */
-        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .kpi-card { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 25px; border-radius: 8px; border-bottom: 4px solid var(--accent-blue); }
-        .kpi-val { font-family: 'Orbitron'; font-size: 2.2rem; font-weight: 900; display: block; margin-top: 10px; }
-        
-        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-        .chart-box { background: var(--bg-card); border: 1px solid var(--border-glow); padding: 25px; border-radius: 12px; height: 380px; }
-        .chart-box h4 { font-family: 'Orbitron'; font-size: 10px; color: var(--accent-cyan); margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
-
-        /* TABLES */
-        .table-container { background: var(--bg-card); border: 1px solid var(--border-glow); border-radius: 12px; overflow: hidden; }
+        /* TABLAS PRO */
+        .table-wrap { background: var(--card); border: 1px solid rgba(0,229,255,0.1); border-radius: 10px; margin-top: 20px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
-        th { padding: 18px; text-align: left; background: rgba(0, 123, 255, 0.05); color: var(--accent-blue); font-family: 'Orbitron'; font-size: 10px; }
-        td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; color: var(--text-secondary); }
-
-        /* MODAL */
-        #modalObs { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:11000; align-items:center; justify-content:center; backdrop-filter:blur(10px); }
-        .modal-content { background:var(--bg-card); border:1px solid var(--accent-blue); padding:30px; width:450px; border-radius:8px; }
-
-        .btn-pro { padding: 12px 20px; background: var(--accent-blue); color: white; border: none; font-family: 'Orbitron'; cursor: pointer; font-weight: bold; font-size: 9px; border-radius: 4px; transition: 0.3s; }
-        .btn-pro:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px var(--accent-cyan); }
+        th { background: rgba(0,123,255,0.1); color: var(--cyan); padding: 15px; text-align: left; font-family: 'Orbitron'; font-size: 10px; }
+        td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .kpi { background: var(--card); padding: 20px; border-radius: 8px; border-bottom: 3px solid var(--blue); }
+        .kpi h3 { font-size: 10px; color: var(--cyan); font-family: 'Orbitron'; }
+        .kpi span { font-size: 24px; font-weight: bold; display: block; margin-top: 5px; }
+
+        .btn { background: var(--blue); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron'; font-size: 9px; }
+        .btn:hover { background: var(--cyan); color: black; }
+
+        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center; }
+        .modal-content { background: var(--card); padding: 30px; border-radius: 10px; width: 400px; border: 1px solid var(--cyan); }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
     <div class="login-box">
-        <h2 style="font-family:'Orbitron'; color:white; margin-bottom:30px; letter-spacing:3px;">IT HELP DESK <span>CONTROL</span></h2>
-        <input type="text" id="lUser" placeholder="ID OPERADOR" class="login-field">
-        <input type="password" id="lPass" placeholder="SECURITY KEY" class="login-field">
-        <button onclick="attemptLogin()" class="btn-pro" style="width:100%; padding:18px;">AUTENTICAR SISTEMA</button>
+        <h2 style="font-family:'Orbitron'; margin-bottom:20px;">SENTINEL IT</h2>
+        <input type="text" id="user" placeholder="USUARIO">
+        <input type="password" id="pass" placeholder="CONTRASEÑA">
+        <button onclick="login()" class="btn" style="width:100%; padding:15px;">ACCEDER</button>
     </div>
 </div>
 
 <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">IT CONTROL CENTER v6.0</div>
-    <div style="padding: 20px 30px; border-bottom: 1px solid var(--border-glow);">
-        <div id="displayUser" style="font-weight:700; font-size:13px; color:#fff;">---</div>
-        <div id="displayRole" style="font-size:8px; font-family:'Orbitron'; color:var(--accent-cyan); margin-top:5px;">SESIÓN PROTEGIDA</div>
-    </div>
-    <nav style="flex: 1;">
-        <div class="nav-item active" id="navMonitor" onclick="switchView('monitor', this)"><i class="fa-solid fa-gauge-high"></i> MONITOR GENERAL</div>
-        <div class="nav-item" id="navResolved" onclick="switchView('resolved', this)"><i class="fa-solid fa-box-archive"></i> TICKETS RESUELTOS</div>
-        <div class="nav-item" onclick="syncData()" style="color:var(--accent-green);"><i class="fa-solid fa-rotate"></i> RE-SYNC DATA</div>
-        <div class="nav-item" onclick="generateExecutiveReport()" style="color:var(--accent-cyan);"><i class="fa-solid fa-file-invoice"></i> GENERAR AUDITORÍA</div>
-    </nav>
-    <div class="nav-item" onclick="location.reload()" style="color: var(--accent-red); border-top: 1px solid var(--border-glow);">
-        <i class="fa-solid fa-power-off"></i> CERRAR SESIÓN
-    </div>
+    <div style="padding:30px; font-family:'Orbitron'; color:var(--cyan); border-bottom:1px solid rgba(255,255,255,0.1);">SISTEMA V6.5</div>
+    <div class="nav-item active" onclick="setView('monitor', this)">MONITOR PENDIENTES</div>
+    <div class="nav-item" onclick="setView('resueltos', this)">TICKETS RESUELTOS</div>
+    <div class="nav-item" onclick="sync()" style="color:var(--green);">RE-SINCRONIZAR</div>
+    <div class="nav-item" onclick="reporte()" style="color:var(--cyan);">DESCARGAR PDF</div>
 </aside>
 
-<main class="main-content" id="mainDashboard">
-    <div class="time-filter">
-        <label style="font-family:'Orbitron'; font-size:11px; color:var(--text-secondary);">RANGO AUDITADO:</label>
-        <select id="timeRange" class="time-select" onchange="updateUI()">
-            <option value="8760">HISTÓRICO TOTAL</option>
-            <option value="720">ÚLTIMOS 30 DÍAS</option>
-            <option value="168">ÚLTIMOS 7 DÍAS</option>
-            <option value="24">ÚLTIMAS 24 HORAS</option>
-        </select>
+<main class="main" id="main">
+    <div id="view-monitor" class="view active">
+        <div class="kpi-row">
+            <div class="kpi"><h3>PENDIENTES</h3><span id="k-pend">0</span></div>
+            <div class="kpi" style="border-color:var(--red)"><h3>CRÍTICOS</h3><span id="k-crit" style="color:var(--red)">0</span></div>
+            <div class="kpi"><h3>SALUD RED</h3><span style="color:var(--green)">94%</span></div>
+            <div class="kpi"><h3>TÉCNICO</h3><span id="userName" style="font-size:14px;">---</span></div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>PRIORIDAD</th><th>DISPOSITIVO</th><th>ESTADO</th><th>ACCIÓN</th></tr>
+                </thead>
+                <tbody id="body-pend"></tbody>
+            </table>
+        </div>
     </div>
 
-    <div id="printArea">
-        <div id="view-monitor" class="dashboard-view active">
-            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-                <h1 style="font-family:'Orbitron'; font-size:24px; letter-spacing:8px;">SISTEMA <span>MONITOR</span></h1>
-                <div id="clock" style="font-family:'Share Tech Mono'; font-size:12px; color:var(--text-secondary);"></div>
-            </header>
-            <div class="kpi-row">
-                <div class="kpi-card"><span>PENDIENTES</span><span class="kpi-val" id="k-pend" style="color:var(--accent-cyan)">0</span></div>
-                <div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICOS</span><span class="kpi-val" id="k-crit" style="color:var(--accent-red)">0</span></div>
-                <div class="kpi-card"><span>BACKLOG</span><span class="kpi-val" id="k-total">0</span></div>
-                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>HEALTH SCORE</span><span class="kpi-val" style="color:var(--accent-green)">94%</span></div>
-            </div>
-            <div class="charts-grid">
-                <div class="chart-box"><h4>SALUD POR SECTORES DE RED</h4><canvas id="chartM1"></canvas></div>
-                <div class="chart-box"><h4>ACUMULACIÓN DE CARGA (AREA)</h4><canvas id="chartM2"></canvas></div>
-            </div>
-            <div class="table-container"><table><thead><tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>EQUIPO</th><th>ACCIÓN</th></tr></thead><tbody id="t-pend"></tbody></table></div>
+    <div id="view-resueltos" class="view">
+        <div class="kpi-row">
+            <div class="kpi" style="border-color:var(--green)"><h3>COMPLETADOS</h3><span id="k-res">0</span></div>
+            <div class="kpi"><h3>SLA</h3><span>100%</span></div>
+            <div class="kpi"><h3>MODO</h3><span>AUDITORÍA</span></div>
         </div>
-
-        <div id="view-resolved" class="dashboard-view">
-            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-                <h1 style="font-family:'Orbitron'; font-size:24px; letter-spacing:8px;">ARCHIVO <span>HISTÓRICO</span></h1>
-            </header>
-            <div class="kpi-row">
-                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>RESUELTOS</span><span class="kpi-val" id="k-res" style="color:var(--accent-green)">0</span></div>
-                <div class="kpi-card"><span>ÉXITO SLA</span><span class="kpi-val">100%</span></div>
-                <div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>T. RESOLUCIÓN</span><span class="kpi-val" id="k-avg" style="color:var(--accent-cyan)">1.2h</span></div>
-                <div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>STATUS</span><span class="kpi-val" style="color:var(--accent-green)">ONLINE</span></div>
-            </div>
-            <div class="charts-grid">
-                <div class="chart-box"><h4>RATIO DE ÉXITO OPERATIVO</h4><canvas id="chartR1"></canvas></div>
-                <div class="chart-box"><h4>RENDIMIENTO TEMPORAL (TREND)</h4><canvas id="chartR2"></canvas></div>
-            </div>
-            <div class="table-container"><table><thead><tr><th>ID</th><th>CIERRE</th><th>TÉCNICO</th><th>OBSERVACIÓN TÉCNICA</th></tr></thead><tbody id="t-res"></tbody></table></div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>FECHA CIERRE</th><th>TÉCNICO</th><th>OBSERVACIÓN FINAL</th></tr>
+                </thead>
+                <tbody id="body-res"></tbody>
+            </table>
         </div>
     </div>
 </main>
 
-<div id="modalObs">
+<div id="modal">
     <div class="modal-content">
-        <h3 style="font-family:'Orbitron'; color:var(--accent-cyan); margin-bottom:15px;">RESOLVER TICKET #<span id="modalTicketId"></span></h3>
-        <textarea id="textoObs" rows="5" placeholder="Escriba la solución aplicada..." class="login-field" style="text-align:left;"></textarea>
+        <h3 style="margin-bottom:15px; font-family:'Orbitron';">RESOLVER TICKET #<span id="mId"></span></h3>
+        <textarea id="mObs" style="width:100%; height:100px; background:#050a14; color:white; border:1px solid var(--blue); padding:10px; margin-bottom:15px;" placeholder="¿Qué se arregló?"></textarea>
         <div style="display:flex; gap:10px;">
-            <button onclick="cerrarModal()" style="flex:1; background:none; border:1px solid gray; color:white; cursor:pointer;">ATRÁS</button>
-            <button onclick="enviarResolucion()" style="flex:2; background:var(--accent-green); border:none; font-family:'Orbitron'; font-weight:bold; cursor:pointer; color:black;">CONFIRMAR CIERRE</button>
+            <button onclick="cerrarM()" style="flex:1; background:gray; border:none; color:white; cursor:pointer;">CANCELAR</button>
+            <button onclick="enviar()" style="flex:2;" class="btn">CERRAR TICKET</button>
         </div>
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
-    
-    const USERS = { 
-        "admin": { name: "YANANTH FAJARDO MOYA", pass: "Admin2026!", role: "ESPECIALISTA INFRAESTRUCTURA" },
-        "chris": { name: "CHRIS MORALES", pass: "Admin123!", role: "CONTROLADOR DE SERVICIOS IT" }
-    };
+    const URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
+    let data = [];
+    let tid = null;
 
-    let fullData = []; let charts = {}; let ticketIdResolviendo = null;
-
-    function attemptLogin() {
-        const u = document.getElementById('lUser').value.trim().toLowerCase();
-        const p = document.getElementById('lPass').value;
-        if(USERS[u] && USERS[u].pass === p) {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'flex';
-            document.getElementById('mainDashboard').style.display = 'block';
-            document.getElementById('displayUser').textContent = USERS[u].name;
-            document.getElementById('displayRole').textContent = USERS[u].role;
-            syncData();
-        } else { alert("ERROR DE CREDENCIALES"); }
+    function login() {
+        const u = document.getElementById('user').value.toLowerCase();
+        const p = document.getElementById('pass').value;
+        if((u==='admin' && p==='Admin2026!') || (u==='chris' && p==='Admin123!')) {
+            document.getElementById('loginOverlay').style.display='none';
+            document.getElementById('sidebar').style.display='flex';
+            document.getElementById('main').style.display='block';
+            document.getElementById('userName').innerText = u.toUpperCase();
+            sync();
+        } else { alert('Acceso denegado'); }
     }
 
-    function switchView(vId, el) {
-        document.querySelectorAll('.dashboard-view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('view-' + vId).classList.add('active');
+    function setView(v, el) {
+        document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+        document.getElementById('view-'+v).classList.add('active');
         el.classList.add('active');
-        updateUI();
     }
 
-    async function syncData() {
-        try {
-            const r = await fetch(SCRIPT_URL);
-            const json = await r.json();
-            fullData = json.map(t => {
-                let n = {};
-                for (let k in t) n[k.toLowerCase().trim()] = t[k];
-                return n;
-            });
-            updateUI();
-        } catch(e) { console.error("Sync Failure"); }
+    async function sync() {
+        const res = await fetch(URL);
+        data = await res.json();
+        render();
     }
 
-    function filterByTime(data) {
-        const hours = parseInt(document.getElementById('timeRange').value);
-        const now = new Date();
-        return data.filter(t => {
-            const dateStr = t['ticket resuelto'] || t['fecha'] || new Date().toISOString();
-            return (now - new Date(dateStr)) / (1000 * 60 * 60) <= hours;
-        });
-    }
-
-    function updateUI() {
-        const timeFiltered = filterByTime(fullData);
-        const pend = timeFiltered.filter(t => t.estado && t.estado.toLowerCase().trim() === 'pendiente');
-        const res = timeFiltered.filter(t => t.estado && t.estado.toLowerCase().trim() === 'resuelto');
+    function render() {
+        const pBody = document.getElementById('body-pend');
+        const rBody = document.getElementById('body-res');
+        pBody.innerHTML = ''; rBody.innerHTML = '';
         
-        document.getElementById('k-pend').textContent = pend.length;
-        document.getElementById('k-crit').textContent = pend.filter(x => x.prioridad === 'Alta').length;
-        document.getElementById('k-total').textContent = fullData.length;
-        document.getElementById('k-res').textContent = res.length;
+        let pCount = 0; let rCount = 0; let cCount = 0;
 
-        document.getElementById('t-pend').innerHTML = pend.map(t => `<tr><td>#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" class="btn-pro" style="padding:2px 8px;">LOG</button></td></tr>`).join('');
-        document.getElementById('t-res').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t['ticket resuelto'] || 'S/F'}</td><td>${t.colaborador}</td><td style="font-family:'Share Tech Mono'; color:var(--accent-cyan); font-size:11px;">${t.observaciones || 'OK'}</td></tr>`).join('');
+        data.forEach(t => {
+            const estado = (t.Estado || t.estado || "").toLowerCase();
+            const prioridad = t.Prioridad || t.prioridad || "Media";
+            const id = t.ID || t.id || "000";
 
-        renderMCharts(pend); renderRCharts(res);
+            if(estado === 'pendiente') {
+                pCount++;
+                if(prioridad.toLowerCase() === 'alta') cCount++;
+                pBody.innerHTML += `<tr>
+                    <td>#${id}</td>
+                    <td style="color:${prioridad==='Alta'?'#ff3d6b':'#f0f5ff'}">${prioridad}</td>
+                    <td>${t.Equipo || t.dispositivo || 'N/A'}</td>
+                    <td><span style="color:orange">PENDIENTE</span></td>
+                    <td><button class="btn" onclick="abrirM('${id}')">LOG</button></td>
+                </tr>`;
+            } else if(estado === 'resuelto') {
+                rCount++;
+                rBody.innerHTML += `<tr>
+                    <td style="color:var(--cyan)">#${id}</td>
+                    <td>${t['Ticket Resuelto'] || t['fecha'] || 'Hoy'}</td>
+                    <td>${t.Técnico || t.colaborador || 'Chris'}</td>
+                    <td style="font-family:'Share Tech Mono'; color:var(--green)">${t.Observaciones || t.observaciones || 'Sin datos'}</td>
+                </tr>`;
+            }
+        });
+
+        document.getElementById('k-pend').innerText = pCount;
+        document.getElementById('k-res').innerText = rCount;
+        document.getElementById('k-crit').innerText = cCount;
     }
 
-    function renderMCharts(data) {
-        const ctx1 = document.getElementById('chartM1').getContext('2d');
-        const ctx2 = document.getElementById('chartM2').getContext('2d');
-        if(charts.m1) charts.m1.destroy(); if(charts.m2) charts.m2.destroy();
-        const base = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
-        charts.m1 = new Chart(ctx1, { type: 'radar', data: { labels: ['Core','Edge','Firewalls','APs','Servers'], datasets: [{ data: [98, 85, 92, 80, 95], borderColor: '#00ffa3', backgroundColor: 'rgba(0, 255, 163, 0.1)' }] }, options: { ...base, scales: { r: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { display: false } } } } });
-        charts.m2 = new Chart(ctx2, { type: 'line', data: { labels: ['08:00','10:00','12:00','14:00','16:00'], datasets: [{ fill: true, data: [2, 10, 15, 8, 20], borderColor: '#007bff', backgroundColor: 'rgba(0, 123, 255, 0.2)', tension: 0.4 }] }, options: base });
+    function abrirM(id) { tid = id; document.getElementById('mId').innerText = id; document.getElementById('modal').style.display='flex'; }
+    function cerrarM() { document.getElementById('modal').style.display='none'; }
+
+    async function enviar() {
+        const obs = document.getElementById('mObs').value;
+        if(!obs) return alert('Ponga la observación');
+        cerrarM();
+        await fetch(URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action:'updateStatus', id:tid, observations:obs}) });
+        setTimeout(sync, 1500);
     }
 
-    function renderRCharts(data) {
-        const ctx1 = document.getElementById('chartR1').getContext('2d');
-        const ctx2 = document.getElementById('chartR2').getContext('2d');
-        if(charts.r1) charts.r1.destroy(); if(charts.r2) charts.r2.destroy();
-        charts.r1 = new Chart(ctx1, { type: 'doughnut', data: { labels: ['OK', 'SLA'], datasets: [{ data: [98, 2], backgroundColor: ['#00ffa3', '#333'], cutout: '80%', borderWidth: 0 }] }, options: { responsive:true, maintainAspectRatio:false } });
-        charts.r2 = new Chart(ctx2, { type: 'line', data: { labels: ['L','M','M','J','V'], datasets: [{ data: [5, 12, 10, 15, 13], borderColor: '#00ffa3', tension: 0.3 }] }, options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { display: false } } } });
-    }
-
-    function abrirModal(id) { ticketIdResolviendo = id; document.getElementById('modalTicketId').textContent = id; document.getElementById('modalObs').style.display='flex'; }
-    function cerrarModal() { document.getElementById('modalObs').style.display='none'; }
-    
-    async function enviarResolucion() {
-        const obs = document.getElementById('textoObs').value.trim();
-        if(!obs) return;
-        const btn = document.querySelector("#modalObs button[onclick='enviarResolucion()']");
-        btn.innerText = "ENVIANDO...";
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateStatus", id: ticketIdResolviendo, observations: obs }) });
-        cerrarModal(); setTimeout(syncData, 1500);
-    }
-
-    async function generateExecutiveReport() {
+    function reporte() {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const printArea = document.getElementById('printArea');
-        const timeLabel = document.getElementById('timeRange').options[document.getElementById('timeRange').selectedIndex].text;
-        const btn = document.querySelector('.nav-item[onclick="generateExecutiveReport()"]');
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PROCESANDO...';
-
-        try {
-            const canvas = await html2canvas(printArea, { backgroundColor: '#020406', scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            
-            doc.setFillColor(2, 4, 6); doc.rect(0, 0, 210, 297, 'F');
-            doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255);
-            doc.setFontSize(22); doc.text("AUDITORÍA ESTRATÉGICA TI", 15, 25);
-            
-            doc.setFontSize(10); doc.setTextColor(139, 155, 180);
-            doc.text("RESPONSABLE: " + document.getElementById('displayUser').innerText, 15, 35);
-            doc.text("PERIODO: " + timeLabel, 15, 40);
-            doc.text("FECHA EMISIÓN: " + new Date().toLocaleString(), 15, 45);
-            
-            doc.setDrawColor(0, 123, 255); doc.line(15, 50, 195, 50);
-            doc.addImage(imgData, 'PNG', 10, 55, 190, 100);
-            
-            doc.setFontSize(12); doc.setTextColor(0, 255, 163);
-            doc.text("1. ANÁLISIS DE OPERACIONES", 15, 170);
-            doc.setFontSize(10); doc.setTextColor(240, 245, 255);
-            doc.text(`La infraestructura se ha gestionado bajo parámetros de alta disponibilidad durante el rango: ${timeLabel}.`, 15, 180);
-            doc.text("- El monitoreo preventivo ha mantenido una salud de red del 94%.", 15, 186);
-            doc.text("- No se detectan cuellos de botella críticos en los sectores auditados.", 15, 192);
-
-            doc.setFontSize(12); doc.setTextColor(0, 255, 163);
-            doc.text("2. IMPACTO ESTRATÉGICO", 15, 210);
-            doc.text("- Continuidad del Negocio: Mitigación de riesgos de desconexión.", 15, 220);
-            doc.text("- Seguridad: Aplicación de hardening en perímetros de red.", 15, 226);
-
-            doc.save(`AUDITORIA_IT_${new Date().getTime()}.pdf`);
-        } catch (e) { alert("Error PDF"); } finally { btn.innerHTML = '<i class="fa-solid fa-file-invoice"></i> GENERAR AUDITORÍA'; }
+        const doc = new jsPDF();
+        doc.setFontSize(20);
+        doc.text("REPORTE DE AUDITORÍA TI - SENTINEL", 10, 20);
+        doc.setFontSize(12);
+        doc.text("Resumen de gestión de infraestructura.", 10, 30);
+        doc.text("Tickets Resueltos: " + document.getElementById('k-res').innerText, 10, 45);
+        doc.text("Tickets Pendientes: " + document.getElementById('k-pend').innerText, 10, 55);
+        doc.save("Reporte_TI.pdf");
     }
-
-    setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleString().toUpperCase(); }, 1000);
 </script>
 </body>
 </html>

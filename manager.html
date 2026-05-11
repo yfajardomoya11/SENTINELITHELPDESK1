@@ -126,47 +126,239 @@
         currentView = v; 
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         document.getElementById(v === 'monitor' ? 'navMonitor' : 'navResolved').classList.add('active');
-        updateUI(); 
-    }
+        updateUI(); <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT REPORT SYSTEM v6.0 | Sentinel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    function updateUI() {
-        const pend = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'pendiente');
-        const res = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'resuelto');
-        const box = document.getElementById('kpiContainer');
+    <style>
+        :root { 
+            --bg-primary: #020406; --bg-card: #0a0e17; --accent-blue: #007bff; 
+            --accent-cyan: #00e5ff; --accent-green: #00ffa3; --text-primary: #f0f5ff; 
+            --text-secondary: #8b9bb4; --border-subtle: rgba(0, 229, 255, 0.15); 
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-primary); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; min-height: 100vh; padding: 40px; }
         
-        if(currentView === 'monitor') {
-            document.getElementById('viewTitle').innerHTML = "MONITOR <span>TICKETS ACTIVOS</span>";
-            box.innerHTML = `<div class="kpi-card"><span>PENDIENTES</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICOS</span><span class="kpi-val">${pend.filter(x=>x.prioridad && x.prioridad.toLowerCase().includes('alta')).length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-amber)"><span>HISTÓRICO</span><span class="kpi-val">${fullData.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>UPTIME</span><span class="kpi-val">99.9%</span></div>`;
-            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>EQUIPO</th><th>ACCIÓN</th></tr>`;
-            document.getElementById('tBody').innerHTML = pend.map(t => `<tr><td>#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" style="background:var(--accent-green); border:none; padding:5px 10px; cursor:pointer; border-radius:4px; font-family:'Orbitron'; font-size:9px;">RESOLVER</button></td></tr>`).join('');
-            renderCharts(pend);
-        } else {
-            document.getElementById('viewTitle').innerHTML = "HISTORIAL <span>SOLUCIONADOS</span>";
-            box.innerHTML = `<div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>CERRADOS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card"><span>ÉXITO</span><span class="kpi-val">100%</span></div><div class="kpi-card"><span>AVG TIME</span><span class="kpi-val">1.2h</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span>SISTEMA</span><span class="kpi-val">OK</span></div>`;
-            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>FECHA CIERRE</th><th>TÉCNICO</th><th>SOLUCIÓN TÉCNICA</th></tr>`;
-            document.getElementById('tBody').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan);">#${t.id}</td><td>${t['ticket resuelto'] || 'S/F'}</td><td>${t.colaborador}</td><td style="font-family:'Share Tech Mono'; font-size:11px; color:var(--accent-cyan);">${t.observaciones || 'OK'}</td></tr>`).join('');
-            renderCharts(res);
+        /* Contenedor del Reporte para Captura PDF */
+        #reportContent { max-width: 1200px; margin: 0 auto; padding: 20px; border: 1px solid var(--border-subtle); background: var(--bg-primary); }
+
+        .header-report { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent-blue); padding-bottom: 20px; margin-bottom: 30px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 8px; text-align: center; }
+        .kpi-val { font-family: 'Orbitron'; font-size: 2rem; color: #fff; display: block; margin-top: 5px; }
+
+        .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .chart-container { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 8px; height: 300px; }
+
+        .table-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: rgba(0, 123, 255, 0.1); color: var(--accent-cyan); padding: 12px; text-align: left; font-family: 'Orbitron'; font-size: 10px; }
+        td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: var(--text-secondary); }
+
+        .btn-action { background: var(--accent-blue); color: white; border: none; padding: 12px 25px; font-family: 'Orbitron'; cursor: pointer; border-radius: 4px; font-weight: bold; margin-bottom: 20px; transition: 0.3s; }
+        .btn-action:hover { background: var(--accent-cyan); color: #000; }
+        
+        #loading { position: fixed; top: 20px; right: 20px; color: var(--accent-green); font-family: 'Share Tech Mono'; display: none; }
+    </style>
+</head>
+<body>
+
+    <div style="display: flex; gap: 10px;">
+        <button class="btn-action" onclick="syncData()"><i class="fa-solid fa-sync"></i> RECARGAR DATOS</button>
+        <button class="btn-action" style="background: var(--accent-green); color: #000;" onclick="generatePDF()">
+            <i class="fa-solid fa-file-pdf"></i> GENERAR INFORME PDF
+        </button>
+    </div>
+
+    <div id="loading">SINCRONIZANDO CON EL EXCEL...</div>
+
+    <div id="reportContent">
+        <div class="header-report">
+            <div>
+                <h1 style="font-family: 'Orbitron'; letter-spacing: 3px;">IT OPERATIONAL <span>REPORT</span></h1>
+                <p style="color: var(--accent-cyan); font-family: 'Share Tech Mono';">GENERADO POR: YANANTH FAJARDO MOYA</p>
+            </div>
+            <div style="text-align: right;">
+                <p id="currentDate" style="font-family: 'Orbitron'; font-size: 12px;"></p>
+                <p style="color: var(--accent-green); font-size: 10px;">ESTADO: SISTEMA ACTIVO</p>
+            </div>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <span style="font-size: 10px; color: var(--text-secondary);">TRAMITADOS</span>
+                <span id="kpiTotal" class="kpi-val">0</span>
+            </div>
+            <div class="kpi-card" style="border-bottom: 4px solid var(--accent-red);">
+                <span style="font-size: 10px; color: var(--text-secondary);">PENDIENTES</span>
+                <span id="kpiPendientes" class="kpi-val">0</span>
+            </div>
+            <div class="kpi-card" style="border-bottom: 4px solid var(--accent-green);">
+                <span style="font-size: 10px; color: var(--text-secondary);">RESUELTOS</span>
+                <span id="kpiResueltos" class="kpi-val">0</span>
+            </div>
+            <div class="kpi-card" style="border-bottom: 4px solid var(--accent-cyan);">
+                <span style="font-size: 10px; color: var(--text-secondary);">EFICIENCIA</span>
+                <span class="kpi-val">100%</span>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-container">
+                <h4 style="font-size: 10px; margin-bottom: 15px; color: var(--accent-cyan);">DISTRIBUCIÓN DE CARGA</h4>
+                <canvas id="chartStatus"></canvas>
+            </div>
+            <div class="chart-container">
+                <h4 style="font-size: 10px; margin-bottom: 15px; color: var(--accent-cyan);">RESOLUCIÓN POR TÉCNICO</h4>
+                <canvas id="chartTech"></canvas>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>COLABORADOR</th>
+                        <th>DISPOSITIVO</th>
+                        <th>ESTADO</th>
+                        <th>PRIORIDAD</th>
+                    </tr>
+                </thead>
+                <tbody id="tBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    // URL DE TU SCRIPT DE GOOGLE
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
+    
+    let fullData = [];
+    let charts = {};
+
+    document.getElementById('currentDate').textContent = new Date().toLocaleString();
+
+    async function syncData() {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const json = await response.json();
+            
+            // Normalizar datos (quitar espacios y minúsculas)
+            fullData = json.map(t => {
+                let n = {};
+                for (let k in t) n[k.toLowerCase().trim()] = t[k];
+                return n;
+            });
+
+            renderUI();
+        } catch (e) {
+            console.error("Error cargando datos:", e);
+            alert("Error al conectar con el Excel. Revisa la URL.");
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
-    function renderCharts(data) {
-        const c1 = document.getElementById('chart1').getContext('2d');
-        const c2 = document.getElementById('chart2').getContext('2d');
-        const c3 = document.getElementById('chart3').getContext('2d');
-        if(charts.c1) charts.c1.destroy(); if(charts.c2) charts.c2.destroy(); if(charts.c3) charts.c3.destroy();
-        charts.c1 = new Chart(c1, { type: 'bar', data: { labels: ['Alta', 'Normal'], datasets: [{ data: [data.filter(x=>x.prioridad && x.prioridad.toLowerCase().includes('alta')).length, 10], backgroundColor: ['#ff3d6b', '#007bff'] }] }, options: { responsive:true, maintainAspectRatio:false } });
-        charts.c2 = new Chart(c2, { type: 'doughnut', data: { labels: ['OK','SLA'], datasets: [{ data: [95, 5], backgroundColor: ['#00ffa3','#333'] }] }, options: { responsive:true, maintainAspectRatio:false } });
-        charts.c3 = new Chart(c3, { type: 'line', data: { labels: ['D4','D3','D2','D1','HOY'], datasets: [{ data: [2, 8, 5, 12, 10], borderColor: '#00e5ff', fill: true }] }, options: { responsive:true, maintainAspectRatio:false } });
+    function renderUI() {
+        const pend = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'pendiente');
+        const res = fullData.filter(t => t.estado && t.estado.toLowerCase().trim() === 'resuelto');
+
+        // Actualizar KPIs
+        document.getElementById('kpiTotal').textContent = fullData.length;
+        document.getElementById('kpiPendientes').textContent = pend.length;
+        document.getElementById('kpiResueltos').textContent = res.length;
+
+        // Tabla
+        const tBody = document.getElementById('tBody');
+        tBody.innerHTML = fullData.map(t => `
+            <tr>
+                <td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td>
+                <td>${t.colaborador || 'N/A'}</td>
+                <td>${t.dispositivo || 'N/A'}</td>
+                <td style="color:${t.estado==='Resuelto'?'var(--accent-green)':'var(--accent-red)'}">${t.estado}</td>
+                <td>${t.prioridad || 'Normal'}</td>
+            </tr>
+        `).join('');
+
+        renderCharts(pend.length, res.length);
     }
 
-    function abrirModal(id) { ticketIdResolviendo = id; document.getElementById('modalTicketId').textContent = id; document.getElementById('modalObs').style.display='flex'; }
-    function cerrarModal() { document.getElementById('modalObs').style.display='none'; }
-    async function enviarResolucion() {
-        const obs = document.getElementById('textoObs').value.trim();
-        if(!obs) return;
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateStatus", id: ticketIdResolviendo, observations: obs }) });
-        cerrarModal(); setTimeout(syncData, 1500);
+    function renderCharts(p, r) {
+        const ctx1 = document.getElementById('chartStatus').getContext('2d');
+        const ctx2 = document.getElementById('chartTech').getContext('2d');
+
+        if(charts.c1) charts.c1.destroy();
+        if(charts.c2) charts.c2.destroy();
+
+        charts.c1 = new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pendientes', 'Resueltos'],
+                datasets: [{
+                    data: [p, r],
+                    backgroundColor: ['#ff3d6b', '#00ffa3'],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        charts.c2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Yananth', 'Otros'],
+                datasets: [{
+                    label: 'Tickets',
+                    data: [r, 2],
+                    backgroundColor: '#007bff'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
     }
+
+    async function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const btn = document.querySelector('.btn-action[onclick="generatePDF()"]');
+        btn.innerHTML = "GENERANDO...";
+        
+        const report = document.getElementById('reportContent');
+        
+        try {
+            const canvas = await html2canvas(report, {
+                backgroundColor: '#020406',
+                scale: 2
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            
+            pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+            pdf.save(`Reporte_IT_${new Date().getTime()}.pdf`);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> GENERAR INFORME PDF';
+        }
+    }
+
+    // Carga inicial
+    window.onload = syncData;
 </script>
 </body>
 </html>

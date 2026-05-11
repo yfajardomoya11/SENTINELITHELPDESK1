@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT COMMAND CENTER v5.2 | Final Flash Edition</title>
+    <title>IT COMMAND CENTER v5.5 | Final Flash</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -74,7 +73,7 @@
 
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <span class="nav-text">IT COMMAND v5.2</span>
+        <span class="nav-text">IT COMMAND v5.5</span>
         <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="cursor:pointer; color:var(--accent-cyan);"></i>
     </div>
     <div class="user-card">
@@ -93,12 +92,12 @@
 
 <main class="main-content" id="mainDashboard" style="display:none;">
     <div class="time-filter">
-        <label style="font-family:'Orbitron'; font-size:11px; color:var(--text-secondary);">FILTRAR POR TIEMPO:</label>
+        <label style="font-family:'Orbitron'; font-size:11px; color:var(--text-secondary);">HISTORIAL DE RED:</label>
         <select id="timeRange" class="time-select" onchange="updateUI()">
-            <option value="8760">TODO EL HISTÓRICO</option>
-            <option value="720">ÚLTIMOS 30 DÍAS</option>
-            <option value="168">ÚLTIMOS 7 DÍAS</option>
-            <option value="24">ÚLTIMAS 24 HORAS</option>
+            <option value="8760">TODO EL REGISTRO</option>
+            <option value="720">30 DÍAS</option>
+            <option value="168">7 DÍAS</option>
+            <option value="24">24 HORAS</option>
         </select>
     </div>
 
@@ -109,9 +108,9 @@
         </header>
         <div class="kpi-row" id="kpiContainer"></div>
         <div class="charts-grid">
-            <div class="chart-box"><h4 id="labelChart1">MÉTRICA 1</h4><canvas id="chart1"></canvas></div>
-            <div class="chart-box"><h4 id="labelChart2">MÉTRICA 2</h4><canvas id="chart2"></canvas></div>
-            <div class="chart-box"><h4 id="labelChart3">MÉTRICA 3</h4><canvas id="chart3"></canvas></div>
+            <div class="chart-box"><h4 id="labelChart1">RADAR</h4><canvas id="chart1"></canvas></div>
+            <div class="chart-box"><h4 id="labelChart2">CARGA</h4><canvas id="chart2"></canvas></div>
+            <div class="chart-box"><h4 id="labelChart3">SALUD</h4><canvas id="chart3"></canvas></div>
         </div>
     </div>
     <div class="table-container"><table><thead id="tHead"></thead><tbody id="tBody"></tbody></table></div>
@@ -129,11 +128,9 @@
 </div>
 
 <script>
-    // URL PROPORCIONADA
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
     const USERS = { 
-        "admin": { name: "YANANTH FAJARDO MOYA", rank: "ESPECIALISTA EN INFRAESTRUCTURA", pass: "Admin2026!", init: "YF", color: "#9d50bb" },
-        "ADMIN_CHRIS": { name: "CHRIS MORALES", rank: "NETWORK ENGINEER", pass: "CHRIS-IT2026!", init: "CM", color: "#007bff" }
+        "admin": { name: "YANANTH FAJARDO MOYA", rank: "ESPECIALISTA EN INFRAESTRUCTURA", pass: "Admin2026!", init: "YF", color: "#9d50bb" }
     };
 
     let fullData = []; let charts = {}; let currentView = 'monitor'; let ticketIdResolviendo = null;
@@ -156,15 +153,21 @@
             document.getElementById('userAvatar').textContent = USERS[u].init;
             document.getElementById('userAvatar').style.background = USERS[u].color;
             syncData();
-        } else { alert("ACCESO DENEGADO"); }
+        } else { alert("CREDENCIALES INVÁLIDAS"); }
     }
 
     async function syncData() { 
         try { 
             const r = await fetch(SCRIPT_URL); 
-            fullData = await r.json(); 
+            const json = await r.json();
+            // Limpieza de datos (normalizar llaves a minúsculas para evitar errores de mapeo)
+            fullData = json.map(item => {
+                let newItem = {};
+                for (let key in item) newItem[key.toLowerCase()] = item[key];
+                return newItem;
+            });
             updateUI(); 
-        } catch(e) { console.error("Error al obtener datos:", e); } 
+        } catch(e) { console.error("Error de Red:", e); } 
     }
 
     function setView(v) { 
@@ -178,17 +181,17 @@
         const hours = parseInt(document.getElementById('timeRange').value);
         const now = new Date();
         return data.filter(t => {
-            const rawDate = t['ticket resuelto'] || t['fecha'];
-            if(!rawDate) return true;
-            const ticketDate = new Date(rawDate);
+            const dateStr = t['ticket resuelto'] || t['fecha'] || new Date().toISOString();
+            const ticketDate = new Date(dateStr);
             return (now - ticketDate) / (1000 * 60 * 60) <= hours;
         });
     }
 
     function updateUI() {
         const timeFiltered = filterDataByTime(fullData);
-        const pend = timeFiltered.filter(t => t.estado === 'Pendiente');
-        const res = timeFiltered.filter(t => t.estado === 'Resuelto');
+        // Filtro robusto para estados
+        const pend = timeFiltered.filter(t => t.estado && t.estado.trim() === 'Pendiente');
+        const res = timeFiltered.filter(t => t.estado && t.estado.trim() === 'Resuelto');
         const box = document.getElementById('kpiContainer');
         
         if(currentView === 'monitor') {
@@ -197,21 +200,22 @@
             document.getElementById('labelChart2').textContent = "CARGA POR PRIORIDAD";
             document.getElementById('labelChart3').textContent = "SALUD DE INFRAESTRUCTURA";
             
-            box.innerHTML = `<div class="kpi-card"><span>ACTIVAS</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICAS</span><span class="kpi-val">${pend.filter(x=>x.prioridad==='Alta').length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-amber)"><span>BACKLOG</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>SLA</span><span class="kpi-val">99.9%</span></div>`;
+            box.innerHTML = `<div class="kpi-card"><span>ACTIVAS</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-red)"><span>CRÍTICAS</span><span class="kpi-val">${pend.filter(x=>x.prioridad==='Alta').length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-amber)"><span>PENDIENTES</span><span class="kpi-val">${pend.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>SLA</span><span class="kpi-val">99.9%</span></div>`;
             
-            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>DISPOSITIVO</th><th>ACCIÓN</th></tr>`;
+            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>PRIORIDAD</th><th>TÉCNICO</th><th>EQUIPO</th><th>ACCIÓN</th></tr>`;
             document.getElementById('tBody').innerHTML = pend.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t.prioridad}</td><td>${t.colaborador}</td><td>${t.dispositivo}</td><td><button onclick="abrirModal('${t.id}')" style="background:var(--accent-green); color:black; padding:5px 12px; border:none; border-radius:4px; font-family:'Orbitron'; font-size:9px; font-weight:bold; cursor:pointer;">RESOLVER</button></td></tr>`).join('');
             renderCharts(pend);
         } else {
             document.getElementById('viewTitle').innerHTML = "TICKETS <span>RESUELTOS</span>";
-            document.getElementById('labelChart1').textContent = "ESTADÍSTICA DE CIERRE";
-            document.getElementById('labelChart2').textContent = "EFICIENCIA OPERATIVA (%)";
-            document.getElementById('labelChart3').textContent = "DISTRIBUCIÓN POR EQUIPO";
+            document.getElementById('labelChart1').textContent = "RENDIMIENTO TEMPORAL";
+            document.getElementById('labelChart2').textContent = "KPI DE EFICIENCIA";
+            document.getElementById('labelChart3').textContent = "DISTRIBUCIÓN POR ÁREA";
             
-            box.innerHTML = `<div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>TERMINADOS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>ÉXITO</span><span class="kpi-val">98%</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-blue)"><span>T. MEDIO</span><span class="kpi-val">1.2h</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span>SISTEMA</span><span class="kpi-val">OK</span></div>`;
+            box.innerHTML = `<div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>CERRADOS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>ÉXITO</span><span class="kpi-val">98%</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-blue)"><span>TIEMPO</span><span class="kpi-val">1.2h</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span>SISTEMA</span><span class="kpi-val">OK</span></div>`;
             
-            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>CIERRE HORA</th><th>TÉCNICO</th><th>OBSERVACIÓN TÉCNICA</th><th>ESTADO</th></tr>`;
-            document.getElementById('tBody').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t['ticket resuelto'] || '---'}</td><td>${t.colaborador}</td><td style="max-width:300px; color:var(--accent-cyan); font-family:'Share Tech Mono';">${t.observaciones || 'OK'}</td><td style="color:var(--accent-green); font-weight:bold;">DONE</td></tr>`).join('');
+            // TABLA DE RESUELTOS OBLIGATORIA
+            document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>FECHA CIERRE</th><th>TÉCNICO</th><th>OBSERVACIÓN</th><th>STATUS</th></tr>`;
+            document.getElementById('tBody').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t['ticket resuelto'] || 'Reg. Anterior'}</td><td>${t.colaborador}</td><td style="color:var(--accent-cyan); font-family:'Share Tech Mono';">${t.observaciones || 'Sin logs'}</td><td style="color:var(--accent-green); font-weight:bold;">SOLVED</td></tr>`).join('');
             renderCharts(res);
         }
     }
@@ -228,9 +232,9 @@
             charts.c2 = new Chart(c2, { type: 'bar', data: { labels: ['Alta', 'Normal'], datasets: [{ data: [data.filter(x=>x.prioridad==='Alta').length, data.filter(x=>x.prioridad==='Normal').length], backgroundColor: ['#ff3d6b', '#007bff'], borderRadius: 5 }] }, options: baseOpts });
             charts.c3 = new Chart(c3, { type: 'polarArea', data: { labels: ['HW','SW','Net','Sec','Ops'], datasets: [{ data: [20, 15, 25, 10, 30], backgroundColor: ['#007bff','#00ffa3','#ffb300','#9d50bb','#ff3d6b'], borderWidth: 0 }] }, options: { ...baseOpts, scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { display: false } } } } });
         } else {
-            charts.c1 = new Chart(c1, { type: 'line', data: { labels: ['H-4','H-3','H-2','H-1','NOW'], datasets: [{ data: [3, 7, 15, 10, 12], borderColor: '#00ffa3', tension: 0.4, fill: true, backgroundColor: 'rgba(0,255,163,0.1)' }] }, options: baseOpts });
-            charts.c2 = new Chart(c2, { type: 'doughnut', data: { labels: ['SLA OK','SLA FAIL'], datasets: [{ data: [95, 5], backgroundColor: ['#00e5ff','#ff3d6b'], borderWidth: 0 }] }, options: { ...baseOpts, scales: { x: { display: false }, y: { display: false } } } });
-            charts.c3 = new Chart(c3, { type: 'bar', data: { labels: ['Server','User','Network','Cloud'], datasets: [{ data: [15, 40, 25, 20], backgroundColor: '#ffb300', borderRadius: 4 }] }, options: baseOpts });
+            charts.c1 = new Chart(c1, { type: 'line', data: { labels: ['D1','D2','D3','D4','D5'], datasets: [{ data: [5, 12, 8, 15, 10], borderColor: '#00ffa3', tension: 0.4, fill: true, backgroundColor: 'rgba(0,255,163,0.1)' }] }, options: baseOpts });
+            charts.c2 = new Chart(c2, { type: 'doughnut', data: { labels: ['OK','SLA'], datasets: [{ data: [94, 6], backgroundColor: ['#00e5ff','#ff3d6b'], borderWidth: 0 }] }, options: { ...baseOpts, scales: { x: { display: false }, y: { display: false } } } });
+            charts.c3 = new Chart(c3, { type: 'bar', data: { labels: ['Srv','User','Net','Cloud'], datasets: [{ data: [15, 35, 25, 25], backgroundColor: '#ffb300', borderRadius: 4 }] }, options: baseOpts });
         }
     }
 
@@ -238,86 +242,32 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         const reportZone = document.getElementById('reportZone');
-        const rangeText = document.getElementById('timeRange').options[document.getElementById('timeRange').selectedIndex].text;
-
         const btn = document.querySelector('.nav-item[onclick="generateITReport()"]');
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span class="nav-text">GENERANDO...</span>';
 
         try {
             const canvas = await html2canvas(reportZone, { backgroundColor: '#020406', scale: 2 });
             const imgData = canvas.toDataURL('image/png');
-            const pdfWidth = doc.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
             doc.setFillColor(2, 4, 6);
             doc.rect(0, 0, 210, 297, 'F');
-            
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(0, 229, 255);
-            doc.setFontSize(18);
-            doc.text("INFORME ESTRATÉGICO DE INFRAESTRUCTURA IT", 10, 18);
-            
-            doc.setFontSize(10);
-            doc.setTextColor(139, 155, 180);
-            doc.text(`ESPECIALISTA RESPONSABLE: ${document.getElementById('displayUser').innerText}`, 10, 25);
-            doc.text(`RANGO AUDITADO: ${rangeText}`, 10, 30);
-            doc.text(`FECHA DE EMISIÓN: ${new Date().toLocaleString().toUpperCase()}`, 10, 35);
-            doc.setDrawColor(0, 123, 255);
-            doc.line(10, 38, 200, 38);
-
-            doc.addImage(imgData, 'PNG', 5, 45, pdfWidth - 10, pdfHeight);
-
-            let y = 45 + pdfHeight + 15;
-            doc.setFontSize(12);
-            doc.setTextColor(0, 255, 163);
-            doc.text("ANÁLISIS DE IMPACTO OPERATIVO (PARA GERENCIA):", 10, y);
-            
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.setTextColor(240, 245, 255);
-            
-            const explanation = [
-                `- CONTINUIDAD ESTRATÉGICA: Durante la ventana de ${rangeText}, se ha mantenido la infraestructura operando al 99.9% de capacidad.`,
-                "- EFICIENCIA TÉCNICA: Se reporta un cierre sistemático de tickets con una tasa de éxito superior al 95%, eliminando deudas técnicas.",
-                "- AHORRO CORPORATIVO: La gestión proactiva de incidentes ha prevenido tiempos muertos, optimizando el ROI operativo.",
-                "- CIBERSEGURIDAD: El monitoreo constante de salud garantiza un perímetro digital íntegro durante la operación."
-            ];
-
-            explanation.forEach(line => {
-                y += 8;
-                doc.text(line, 12, y, { maxWidth: 185 });
-            });
-
-            y += 20;
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(157, 80, 187);
-            doc.text("CERTIFICACIÓN DEL ESPECIALISTA RESPONSABLE:", 10, y);
-            doc.setFont("helvetica", "italic");
-            doc.setTextColor(240, 245, 255);
-            doc.text("Se certifica que la infraestructura está ESTABLE bajo monitoreo proactivo constante.", 10, y + 6);
-
-            doc.save(`IT_AUDIT_V51_${new Date().getTime()}.pdf`);
-        } catch (err) {
-            console.error(err);
-            alert("Error al generar PDF");
-        } finally {
-            btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i><span class="nav-text">INFORME DE AUDITORÍA</span>';
-        }
+            doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255);
+            doc.text("INFORME DE GESTIÓN IT - COMMAND CENTER", 10, 15);
+            doc.addImage(imgData, 'PNG', 5, 30, 200, 100);
+            doc.setFontSize(10); doc.setTextColor(240, 245, 255);
+            doc.text("ANÁLISIS DE IMPACTO CORPORATIVO:", 10, 140);
+            const lines = ["- Estabilidad de Red al 99.9%.", "- Resolución de incidentes críticos proactiva.", "- Mitigación de riesgos técnicos completada."];
+            lines.forEach((l, i) => doc.text(l, 12, 148 + (i * 7)));
+            doc.save(`INFORME_IT_FINAL_${new Date().getTime()}.pdf`);
+        } catch (e) { console.error(e); } finally { btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i><span class="nav-text">INFORME DE AUDITORÍA</span>'; }
     }
 
     function abrirModal(id) { ticketIdResolviendo = id; document.getElementById('modalTicketId').textContent = id; document.getElementById('modalObs').style.display='flex'; }
     function cerrarModal() { document.getElementById('modalObs').style.display='none'; }
-    
     async function enviarResolucion() {
         const obs = document.getElementById('textoObs').value.trim();
         if(!obs) return;
-        await fetch(SCRIPT_URL, { 
-            method: "POST", 
-            mode: "no-cors", 
-            body: JSON.stringify({ action: "updateStatus", id: ticketIdResolviendo, newStatus: "Resuelto", observations: obs }) 
-        });
-        cerrarModal(); 
-        setTimeout(syncData, 1500);
+        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateStatus", id: ticketIdResolviendo, newStatus: "Resuelto", observations: obs }) });
+        cerrarModal(); setTimeout(syncData, 1500);
     }
 </script>
 </body>

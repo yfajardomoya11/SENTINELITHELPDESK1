@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTINEL IT CONTROL v6.5</title>
+    <title>SENTINEL IT CONTROL v7.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -20,85 +20,99 @@
 
         /* LOGIN */
         #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--card); border: 1px solid var(--blue); padding: 40px; border-radius: 10px; width: 350px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #050a14; border: 1px solid var(--blue); color: white; border-radius: 5px; }
+        .login-box { background: var(--card); border: 1px solid var(--blue); padding: 40px; border-radius: 10px; width: 380px; text-align: center; border-top: 4px solid var(--blue); }
 
         /* SIDEBAR */
         .sidebar { width: var(--sidebar); background: #060b14; border-right: 1px solid rgba(0,229,255,0.1); display: none; flex-direction: column; }
-        .nav-item { padding: 20px; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s; color: #8b9bb4; font-family: 'Orbitron'; font-size: 11px; }
+        .nav-item { padding: 20px 25px; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s; color: #8b9bb4; font-family: 'Orbitron'; font-size: 11px; display: flex; align-items: center; gap: 15px; }
         .nav-item.active { background: rgba(0,229,255,0.05); border-left-color: var(--cyan); color: var(--cyan); }
 
-        /* CONTENT */
-        .main { flex: 1; padding: 30px; overflow-y: auto; display: none; }
+        /* MAIN */
+        .main { flex: 1; padding: 30px; overflow-y: auto; display: none; position: relative; }
         .view { display: none; }
-        .view.active { display: block; }
+        .view.active { display: block; animation: fadeIn 0.4s ease; }
 
-        /* TABLAS PRO */
-        .table-wrap { background: var(--card); border: 1px solid rgba(0,229,255,0.1); border-radius: 10px; margin-top: 20px; overflow: hidden; }
+        /* TABLAS NEON */
+        .table-wrap { background: var(--card); border: 1px solid rgba(0,229,255,0.1); border-radius: 10px; margin-top: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         table { width: 100%; border-collapse: collapse; }
-        th { background: rgba(0,123,255,0.1); color: var(--cyan); padding: 15px; text-align: left; font-family: 'Orbitron'; font-size: 10px; }
-        td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        th { background: rgba(0,123,255,0.1); color: var(--cyan); padding: 15px; text-align: left; font-family: 'Orbitron'; font-size: 10px; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; color: #8b9bb4; }
         
         .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi { background: var(--card); padding: 20px; border-radius: 8px; border-bottom: 3px solid var(--blue); }
-        .kpi h3 { font-size: 10px; color: var(--cyan); font-family: 'Orbitron'; }
-        .kpi span { font-size: 24px; font-weight: bold; display: block; margin-top: 5px; }
+        .kpi { background: var(--card); padding: 20px; border-radius: 8px; border-bottom: 3px solid var(--blue); transition: 0.3s; }
+        .kpi:hover { transform: translateY(-5px); border-color: var(--cyan); }
+        .kpi h3 { font-size: 10px; color: var(--cyan); font-family: 'Orbitron'; letter-spacing: 1px; }
+        .kpi span { font-size: 28px; font-weight: bold; display: block; margin-top: 8px; color: white; }
 
-        .btn { background: var(--blue); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron'; font-size: 9px; }
-        .btn:hover { background: var(--cyan); color: black; }
+        .btn { background: var(--blue); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron'; font-size: 9px; transition: 0.3s; }
+        .btn:hover { background: var(--cyan); color: black; box-shadow: 0 0 15px var(--cyan); }
 
-        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center; }
-        .modal-content { background: var(--card); padding: 30px; border-radius: 10px; width: 400px; border: 1px solid var(--cyan); }
+        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card); padding: 30px; border-radius: 10px; width: 450px; border: 1px solid var(--blue); }
+        textarea { width: 100%; height: 120px; background: #050a14; color: white; border: 1px solid var(--blue); padding: 15px; margin: 15px 0; font-family: 'Share Tech Mono'; outline: none; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
     <div class="login-box">
-        <h2 style="font-family:'Orbitron'; margin-bottom:20px;">SENTINEL IT</h2>
-        <input type="text" id="user" placeholder="USUARIO">
-        <input type="password" id="pass" placeholder="CONTRASEÑA">
-        <button onclick="login()" class="btn" style="width:100%; padding:15px;">ACCEDER</button>
+        <h2 style="font-family:'Orbitron'; color:var(--cyan); margin-bottom:10px;">IT COMMAND CENTER</h2>
+        <p style="font-size:10px; color:var(--text-secondary); margin-bottom:25px;">CONTROL DE INFRAESTRUCTURA V7.0</p>
+        <input type="text" id="user" placeholder="ID OPERADOR" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #050a14; border: 1px solid var(--blue); color: white;">
+        <input type="password" id="pass" placeholder="SECURITY KEY" style="width: 100%; padding: 12px; margin-bottom: 25px; background: #050a14; border: 1px solid var(--blue); color: white;">
+        <button onclick="login()" class="btn" style="width:100%; padding:15px; font-size:12px;">AUTENTICAR SISTEMA</button>
     </div>
 </div>
 
 <aside class="sidebar" id="sidebar">
-    <div style="padding:30px; font-family:'Orbitron'; color:var(--cyan); border-bottom:1px solid rgba(255,255,255,0.1);">SISTEMA V6.5</div>
-    <div class="nav-item active" onclick="setView('monitor', this)">MONITOR PENDIENTES</div>
-    <div class="nav-item" onclick="setView('resueltos', this)">TICKETS RESUELTOS</div>
-    <div class="nav-item" onclick="sync()" style="color:var(--green);">RE-SINCRONIZAR</div>
-    <div class="nav-item" onclick="reporte()" style="color:var(--cyan);">DESCARGAR PDF</div>
+    <div style="padding:30px; font-family:'Orbitron'; color:var(--cyan); border-bottom:1px solid rgba(255,255,255,0.1); font-size:12px; letter-spacing:2px;">SENTINEL IT</div>
+    <div style="padding:20px 25px; border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div id="uName" style="font-weight:bold; font-size:14px; color:white;">---</div>
+        <div id="uRole" style="font-size:9px; color:var(--cyan); font-family:'Orbitron'; margin-top:5px;">OPERADOR</div>
+    </div>
+    <nav style="flex:1;">
+        <div class="nav-item active" onclick="setView('monitor', this)"><i class="fa-solid fa-gauge"></i> MONITOR PENDIENTES</div>
+        <div class="nav-item" onclick="setView('resueltos', this)"><i class="fa-solid fa-check-double"></i> TICKETS RESUELTOS</div>
+        <div class="nav-item" onclick="sync()" style="color:var(--green);"><i class="fa-solid fa-rotate"></i> RE-SYNC CLOUD</div>
+        <div class="nav-item" onclick="reporte()" style="color:var(--cyan);"><i class="fa-solid fa-file-pdf"></i> INFORME AUDITORÍA</div>
+    </nav>
+    <div class="nav-item" onclick="location.reload()" style="color:var(--red); border-top:1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-power-off"></i> CERRAR SESIÓN</div>
 </aside>
 
 <main class="main" id="main">
     <div id="view-monitor" class="view active">
+        <header style="margin-bottom:30px;">
+            <h1 style="font-family:'Orbitron'; letter-spacing:5px;">SISTEMA <span>MONITOR</span></h1>
+        </header>
         <div class="kpi-row">
             <div class="kpi"><h3>PENDIENTES</h3><span id="k-pend">0</span></div>
             <div class="kpi" style="border-color:var(--red)"><h3>CRÍTICOS</h3><span id="k-crit" style="color:var(--red)">0</span></div>
-            <div class="kpi"><h3>SALUD RED</h3><span style="color:var(--green)">94%</span></div>
-            <div class="kpi"><h3>TÉCNICO</h3><span id="userName" style="font-size:14px;">---</span></div>
+            <div class="kpi"><h3>TRAMITADOS</h3><span id="k-total">0</span></div>
+            <div class="kpi" style="border-color:var(--green)"><h3>SALUD RED</h3><span>94%</span></div>
         </div>
         <div class="table-wrap">
             <table>
-                <thead>
-                    <tr><th>ID</th><th>PRIORIDAD</th><th>DISPOSITIVO</th><th>ESTADO</th><th>ACCIÓN</th></tr>
-                </thead>
+                <thead><tr><th>ID</th><th>PRIORIDAD</th><th>DISPOSITIVO</th><th>ESTADO</th><th>ACCION</th></tr></thead>
                 <tbody id="body-pend"></tbody>
             </table>
         </div>
     </div>
 
     <div id="view-resueltos" class="view">
+        <header style="margin-bottom:30px;">
+            <h1 style="font-family:'Orbitron'; letter-spacing:5px;">LOG <span>HISTÓRICO</span></h1>
+        </header>
         <div class="kpi-row">
-            <div class="kpi" style="border-color:var(--green)"><h3>COMPLETADOS</h3><span id="k-res">0</span></div>
-            <div class="kpi"><h3>SLA</h3><span>100%</span></div>
-            <div class="kpi"><h3>MODO</h3><span>AUDITORÍA</span></div>
+            <div class="kpi" style="border-color:var(--green)"><h3>RESUELTOS</h3><span id="k-res">0</span></div>
+            <div class="kpi"><h3>ÉXITO SLA</h3><span>100%</span></div>
+            <div class="kpi" style="border-color:var(--cyan)"><h3>T. PROMEDIO</h3><span>1.2h</span></div>
+            <div class="kpi" style="border-color:var(--green)"><h3>STATUS</h3><span style="color:var(--green)">ONLINE</span></div>
         </div>
         <div class="table-wrap">
             <table>
-                <thead>
-                    <tr><th>ID</th><th>FECHA CIERRE</th><th>TÉCNICO</th><th>OBSERVACIÓN FINAL</th></tr>
-                </thead>
+                <thead><tr><th>ID</th><th>FECHA CIERRE</th><th>TÉCNICO</th><th>OBSERVACIÓN TÉCNICA</th></tr></thead>
                 <tbody id="body-res"></tbody>
             </table>
         </div>
@@ -107,30 +121,35 @@
 
 <div id="modal">
     <div class="modal-content">
-        <h3 style="margin-bottom:15px; font-family:'Orbitron';">RESOLVER TICKET #<span id="mId"></span></h3>
-        <textarea id="mObs" style="width:100%; height:100px; background:#050a14; color:white; border:1px solid var(--blue); padding:10px; margin-bottom:15px;" placeholder="¿Qué se arregló?"></textarea>
+        <h3 style="font-family:'Orbitron'; color:var(--cyan);">RESOLVER TICKET #<span id="mId"></span></h3>
+        <textarea id="mObs" placeholder="Describa la solución técnica aplicada..."></textarea>
         <div style="display:flex; gap:10px;">
-            <button onclick="cerrarM()" style="flex:1; background:gray; border:none; color:white; cursor:pointer;">CANCELAR</button>
-            <button onclick="enviar()" style="flex:2;" class="btn">CERRAR TICKET</button>
+            <button onclick="cerrarM()" style="flex:1; background:#333; border:none; color:white; cursor:pointer; font-family:'Orbitron'; font-size:9px; border-radius:4px;">CANCELAR</button>
+            <button onclick="enviar()" style="flex:2;" class="btn">CONFIRMAR CIERRE</button>
         </div>
     </div>
 </div>
 
 <script>
     const URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
+    const USERS = {
+        "admin": { name: "YANANTH FAJARDO MOYA", pass: "Admin2026!", role: "ESPECIALISTA INFRAESTRUCTURA" },
+        "chris": { name: "CHRIS MORALES", pass: "Admin123!", role: "CONTROLADOR SOPORTE IT" }
+    };
     let data = [];
-    let tid = null;
+    let curId = null;
 
     function login() {
         const u = document.getElementById('user').value.toLowerCase();
         const p = document.getElementById('pass').value;
-        if((u==='admin' && p==='Admin2026!') || (u==='chris' && p==='Admin123!')) {
+        if(USERS[u] && USERS[u].pass === p) {
             document.getElementById('loginOverlay').style.display='none';
             document.getElementById('sidebar').style.display='flex';
             document.getElementById('main').style.display='block';
-            document.getElementById('userName').innerText = u.toUpperCase();
+            document.getElementById('uName').innerText = USERS[u].name;
+            document.getElementById('uRole').innerText = USERS[u].role;
             sync();
-        } else { alert('Acceso denegado'); }
+        } else { alert('Credenciales incorrectas'); }
     }
 
     function setView(v, el) {
@@ -141,9 +160,16 @@
     }
 
     async function sync() {
-        const res = await fetch(URL);
-        data = await res.json();
-        render();
+        try {
+            const res = await fetch(URL);
+            const json = await res.json();
+            data = json.map(row => {
+                let obj = {};
+                for(let key in row) obj[key.toLowerCase().trim()] = row[key];
+                return obj;
+            });
+            render();
+        } catch(e) { console.error("Error Sync", e); }
     }
 
     function render() {
@@ -154,27 +180,26 @@
         let pCount = 0; let rCount = 0; let cCount = 0;
 
         data.forEach(t => {
-            const estado = (t.Estado || t.estado || "").toLowerCase();
-            const prioridad = t.Prioridad || t.prioridad || "Media";
-            const id = t.ID || t.id || "000";
+            const estado = (t.estado || "").toLowerCase();
+            const id = t.id || "000";
 
             if(estado === 'pendiente') {
                 pCount++;
-                if(prioridad.toLowerCase() === 'alta') cCount++;
+                if((t.prioridad || "").toLowerCase() === 'alta') cCount++;
                 pBody.innerHTML += `<tr>
-                    <td>#${id}</td>
-                    <td style="color:${prioridad==='Alta'?'#ff3d6b':'#f0f5ff'}">${prioridad}</td>
-                    <td>${t.Equipo || t.dispositivo || 'N/A'}</td>
-                    <td><span style="color:orange">PENDIENTE</span></td>
+                    <td style="color:var(--cyan); font-weight:bold;">#${id}</td>
+                    <td>${t.prioridad || 'Media'}</td>
+                    <td>${t.dispositivo || t.equipo || 'N/A'}</td>
+                    <td><span style="color:orange">ACTIVO</span></td>
                     <td><button class="btn" onclick="abrirM('${id}')">LOG</button></td>
                 </tr>`;
             } else if(estado === 'resuelto') {
                 rCount++;
                 rBody.innerHTML += `<tr>
-                    <td style="color:var(--cyan)">#${id}</td>
-                    <td>${t['Ticket Resuelto'] || t['fecha'] || 'Hoy'}</td>
-                    <td>${t.Técnico || t.colaborador || 'Chris'}</td>
-                    <td style="font-family:'Share Tech Mono'; color:var(--green)">${t.Observaciones || t.observaciones || 'Sin datos'}</td>
+                    <td style="color:var(--cyan); font-weight:bold;">#${id}</td>
+                    <td>${t['ticket resuelto'] || 'S/F'}</td>
+                    <td>${t.colaborador || t.técnico || 'Chris'}</td>
+                    <td style="font-family:'Share Tech Mono'; color:var(--cyan); font-size:11px;">${t.observaciones || 'LOGS OK'}</td>
                 </tr>`;
             }
         });
@@ -182,29 +207,43 @@
         document.getElementById('k-pend').innerText = pCount;
         document.getElementById('k-res').innerText = rCount;
         document.getElementById('k-crit').innerText = cCount;
+        document.getElementById('k-total').innerText = data.length;
     }
 
-    function abrirM(id) { tid = id; document.getElementById('mId').innerText = id; document.getElementById('modal').style.display='flex'; }
+    function abrirM(id) { curId = id; document.getElementById('mId').innerText = id; document.getElementById('modal').style.display='flex'; }
     function cerrarM() { document.getElementById('modal').style.display='none'; }
 
     async function enviar() {
         const obs = document.getElementById('mObs').value;
-        if(!obs) return alert('Ponga la observación');
-        cerrarM();
-        await fetch(URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action:'updateStatus', id:tid, observations:obs}) });
+        if(!obs) return;
+        const btn = document.querySelector("#modal .btn");
+        btn.disabled = true; btn.innerText = "ENVIANDO...";
+        await fetch(URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action:'updateStatus', id:curId, observations:obs}) });
+        cerrarM(); btn.disabled = false; btn.innerText = "CONFIRMAR CIERRE";
         setTimeout(sync, 1500);
     }
 
-    function reporte() {
+    async function reporte() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFontSize(20);
-        doc.text("REPORTE DE AUDITORÍA TI - SENTINEL", 10, 20);
-        doc.setFontSize(12);
-        doc.text("Resumen de gestión de infraestructura.", 10, 30);
-        doc.text("Tickets Resueltos: " + document.getElementById('k-res').innerText, 10, 45);
-        doc.text("Tickets Pendientes: " + document.getElementById('k-pend').innerText, 10, 55);
-        doc.save("Reporte_TI.pdf");
+        doc.setFillColor(2, 4, 6); doc.rect(0, 0, 210, 297, 'F');
+        doc.setFont("helvetica", "bold"); doc.setTextColor(0, 229, 255);
+        doc.setFontSize(22); doc.text("AUDITORÍA DE INFRAESTRUCTURA TI", 15, 25);
+        doc.setFontSize(10); doc.setTextColor(139, 155, 180);
+        doc.text("RESPONSABLE: " + document.getElementById('uName').innerText, 15, 35);
+        doc.text("FECHA: " + new Date().toLocaleString(), 15, 42);
+        
+        doc.setFontSize(12); doc.setTextColor(0, 255, 163);
+        doc.text("RESUMEN OPERATIVO:", 15, 60);
+        doc.setFontSize(10); doc.setTextColor(255, 255, 255);
+        doc.text("- Tickets Resueltos: " + document.getElementById('k-res').innerText, 15, 70);
+        doc.text("- Tickets Pendientes: " + document.getElementById('k-pend').innerText, 15, 77);
+        doc.text("- Salud de Red Global: 94%", 15, 84);
+        
+        doc.text("TI garantiza la continuidad del negocio mitigando riesgos críticos", 15, 100);
+        doc.text("en los sectores de red auditados.", 15, 105);
+        
+        doc.save("Reporte_Sentinel_IT.pdf");
     }
 </script>
 </body>

@@ -46,7 +46,6 @@
   .btn-submit { width: 100%; padding: 20px; background: var(--accent-blue); border: none; color: white; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 4px; border-radius: 4px; transition: 0.3s; }
   .btn-submit:hover { background: #0056b3; box-shadow: 0 0 30px rgba(0, 123, 255, 0.4); }
 
-  /* VISTA DE ÉXITO CON CHECK AZUL */
   #successView { display: none; text-align: center; animation: fadeIn 0.5s ease; }
   .check-container { width: 80px; height: 80px; background: rgba(0, 123, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--accent-blue); box-shadow: 0 0 20px rgba(0, 123, 255, 0.2); }
   .check-icon { font-size: 40px; color: var(--accent-blue); text-shadow: 0 0 10px var(--accent-blue); }
@@ -71,6 +70,7 @@
           <option>Sherlock Holmes</option>
           <option>Hulk</option>
           <option>Batman</option>
+          <option>Yanant Fajardo</option>
         </select>
       </div>
 
@@ -107,7 +107,7 @@
       <div class="priority-container">
         <label class="form-label">NIVEL DE URGENCIA</label>
         <input type="range" min="1" max="3" value="2" class="priority-slider" id="pSlider" oninput="updatePriority()">
-        <div class="priority-labels">
+        <div class="priority-labels" style="display:flex; justify-content:space-between; padding:0 5px;">
           <span class="p-label" id="lbl1">BAJA</span>
           <span class="p-label state-mid" id="lbl2">NORMAL</span>
           <span class="p-label" id="lbl3">ALTA</span>
@@ -136,6 +136,7 @@
 </div>
 
 <script>
+  // URL ÚNICA DE TU GOOGLE APPS SCRIPT
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
   
   function explainGestion() {
@@ -179,29 +180,49 @@
     const fal = document.getElementById('falla').value;
     const prio = ["Baja", "Normal", "Alta"][document.getElementById('pSlider').value-1];
 
-    if (!col || !ges || !dev || !fal) { alert("⚠️ Complete todos los campos."); return; }
+    if (!col || !ges || !dev || !fal) { alert("⚠️ Complete todos los campos requeridos."); return; }
 
     const btn = document.getElementById('btnSend');
     btn.disabled = true; btn.textContent = "ENVIANDO REPORTE...";
     const tId = "TK-" + Math.random().toString(36).substr(2, 6).toUpperCase();
 
+    // Estructura de datos alineada con el motor DevSecOps
+    const payload = {
+      action: "add",
+      id: tId,
+      colaborador: col,
+      gestion: ges,
+      dispositivo: dev,
+      falla: fal,
+      prioridad: prio,
+      descripcion: document.getElementById('descripcion').value || "Sin notas adicionales",
+      fecha: new Date().toLocaleString(),
+      estado: "Pendiente"
+    };
+
     try {
       await fetch(SCRIPT_URL, {
-        method: "POST", mode: "no-cors",
-        body: JSON.stringify({
-          action: "add", id: tId, colaborador: col, gestion: ges,
-          dispositivo: dev, falla: fal, descripcion: document.getElementById('descripcion').value,
-          fechaDisplay: new Date().toLocaleString(), estado: "Pendiente", prioridad: prio
-        })
+        method: "POST",
+        mode: "no-cors",
+        cache: "no-cache",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
+      
+      // Feedback de éxito
       document.getElementById('formView').style.display = 'none';
       document.getElementById('userName').textContent = col;
       document.getElementById('resId').textContent = tId;
       document.getElementById('successView').style.display = 'block';
-    } catch (e) { alert("Error de conexión"); btn.disabled = false; }
+      
+    } catch (e) { 
+      console.error("Fallo de red:", e);
+      alert("Error de conexión con el servidor central."); 
+      btn.disabled = false; 
+      btn.textContent = "ENVIAR REPORTE";
+    }
   }
   updatePriority();
 </script>
 </body>
-</html>
 </html>

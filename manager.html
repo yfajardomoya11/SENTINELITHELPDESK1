@@ -108,9 +108,9 @@
         </header>
         <div class="kpi-row" id="kpiContainer"></div>
         <div class="charts-grid">
-            <div class="chart-box"><h4 id="labelChart1">RADAR</h4><canvas id="chart1"></canvas></div>
-            <div class="chart-box"><h4 id="labelChart2">CARGA</h4><canvas id="chart2"></canvas></div>
-            <div class="chart-box"><h4 id="labelChart3">SALUD</h4><canvas id="chart3"></canvas></div>
+            <div class="chart-box"><h4 id="labelChart1">RADAR DE INCIDENCIAS</h4><canvas id="chart1"></canvas></div>
+            <div class="chart-box"><h4 id="labelChart2">CARGA POR PRIORIDAD</h4><canvas id="chart2"></canvas></div>
+            <div class="chart-box"><h4 id="labelChart3">SALUD DE INFRAESTRUCTURA</h4><canvas id="chart3"></canvas></div>
         </div>
     </div>
     <div class="table-container"><table><thead id="tHead"></thead><tbody id="tBody"></tbody></table></div>
@@ -128,7 +128,9 @@
 </div>
 
 <script>
+    // URL ACTUALIZADA
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10QS9LR8KukvKKd9jvGIQCg6zPnPLt5Mtp6Uv5oAZUwmgBjivMcv-vUHEWz90z4E9dA/exec";
+    
     const USERS = { 
         "admin": { name: "YANANTH FAJARDO MOYA", rank: "ESPECIALISTA EN INFRAESTRUCTURA", pass: "Admin2026!", init: "YF", color: "#9d50bb" }
     };
@@ -160,7 +162,7 @@
         try { 
             const r = await fetch(SCRIPT_URL); 
             const json = await r.json();
-            // Limpieza de datos (normalizar llaves a minúsculas para evitar errores de mapeo)
+            // Normalización de llaves a minúsculas
             fullData = json.map(item => {
                 let newItem = {};
                 for (let key in item) newItem[key.toLowerCase()] = item[key];
@@ -189,7 +191,6 @@
 
     function updateUI() {
         const timeFiltered = filterDataByTime(fullData);
-        // Filtro robusto para estados
         const pend = timeFiltered.filter(t => t.estado && t.estado.trim() === 'Pendiente');
         const res = timeFiltered.filter(t => t.estado && t.estado.trim() === 'Resuelto');
         const box = document.getElementById('kpiContainer');
@@ -213,9 +214,8 @@
             
             box.innerHTML = `<div class="kpi-card" style="border-bottom-color:var(--accent-green)"><span>CERRADOS</span><span class="kpi-val">${res.length}</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-cyan)"><span>ÉXITO</span><span class="kpi-val">98%</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-blue)"><span>TIEMPO</span><span class="kpi-val">1.2h</span></div><div class="kpi-card" style="border-bottom-color:var(--accent-purple)"><span>SISTEMA</span><span class="kpi-val">OK</span></div>`;
             
-            // TABLA DE RESUELTOS OBLIGATORIA
             document.getElementById('tHead').innerHTML = `<tr><th>ID</th><th>FECHA CIERRE</th><th>TÉCNICO</th><th>OBSERVACIÓN</th><th>STATUS</th></tr>`;
-            document.getElementById('tBody').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t['ticket resuelto'] || 'Reg. Anterior'}</td><td>${t.colaborador}</td><td style="color:var(--accent-cyan); font-family:'Share Tech Mono';">${t.observaciones || 'Sin logs'}</td><td style="color:var(--accent-green); font-weight:bold;">SOLVED</td></tr>`).join('');
+            document.getElementById('tBody').innerHTML = res.map(t => `<tr><td style="color:var(--accent-cyan); font-weight:bold;">#${t.id}</td><td>${t['ticket resuelto'] || '---'}</td><td>${t.colaborador}</td><td style="color:var(--accent-cyan); font-family:'Share Tech Mono';">${t.observaciones || 'OK'}</td><td style="color:var(--accent-green); font-weight:bold;">SOLVED</td></tr>`).join('');
             renderCharts(res);
         }
     }
